@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using Persistence.Interfaces;
 
-namespace Application.MonthlyStatistics.Queries
+namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
 {
     public class GetMonthlyStatsQueryHandler : IRequestHandler<GetMonthlyStatsQuery, StatResults>
     {
