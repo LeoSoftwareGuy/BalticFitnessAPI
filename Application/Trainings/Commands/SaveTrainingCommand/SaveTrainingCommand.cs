@@ -15,11 +15,11 @@ namespace Application.Trainings.Commands.SaveTrainingCommand
         public class SaveTrainingCommandHandler : IRequestHandler<SaveTrainingCommand, Unit>
         {
             private readonly IMapper _mapper;
-            private readonly IMongoDbContext _context;
+            private readonly ITrainingDbContext _context;
             private readonly IMediator _mediator;
             private readonly ICurrentUserService _currentUserService;
 
-            public SaveTrainingCommandHandler(IMongoDbContext context, IMediator mediator, IMapper mapper, ICurrentUserService currentUserService)
+            public SaveTrainingCommandHandler(ITrainingDbContext context, IMediator mediator, IMapper mapper, ICurrentUserService currentUserService)
             {
                 _mapper = mapper;
                 _context = context;
@@ -41,11 +41,11 @@ namespace Application.Trainings.Commands.SaveTrainingCommand
                 var entity = new Training
                 {
                     UserId = userId,
-                    Trained = DateTime.UtcNow,
                     ExerciseSets = exerciseSets
                 };
 
-                await _context.Trainings.InsertOneAsync(entity, cancellationToken: cancellationToken);
+                await _context.Trainings.AddAsync(entity, cancellationToken: cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken: cancellationToken);
                 await _mediator.Publish(new TrainingAdded { UserId = entity.UserId }, cancellationToken);
 
                 return Unit.Value;

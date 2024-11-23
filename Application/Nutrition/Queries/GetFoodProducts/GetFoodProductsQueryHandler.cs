@@ -2,7 +2,6 @@
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 using Persistence.Interfaces;
 
 namespace Application.Nutrition.Queries.GetFoodProducts
@@ -10,9 +9,9 @@ namespace Application.Nutrition.Queries.GetFoodProducts
     public class GetFoodProductsQueryHandler : IRequestHandler<GetFoodProductsQuery, List<ProductDto>>
     {
         private readonly IMapper _mapper;
-        private readonly IMongoDbContext _context;
+        private readonly ITrainingDbContext _context;
 
-        public GetFoodProductsQueryHandler(IMapper mapper, IMongoDbContext context)
+        public GetFoodProductsQueryHandler(IMapper mapper, ITrainingDbContext context)
         {
             _mapper = mapper;
             _context = context;
@@ -21,8 +20,7 @@ namespace Application.Nutrition.Queries.GetFoodProducts
         public async Task<List<ProductDto>> Handle(GetFoodProductsQuery request, CancellationToken cancellationToken)
         {
             var foodType = await _context.FoodTypes
-               .Find(c => c.Name.Equals(request.FoodTypeUrl, StringComparison.OrdinalIgnoreCase))
-               .FirstOrDefaultAsync(cancellationToken);
+               .FirstOrDefaultAsync(c => c.Name.Equals(request.FoodTypeUrl, StringComparison.OrdinalIgnoreCase),cancellationToken);
 
 
             if (foodType == null)

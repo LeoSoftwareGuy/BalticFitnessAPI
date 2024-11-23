@@ -4,7 +4,6 @@ using AutoMapper;
 using Domain.Nutrition;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 using Persistence.Interfaces;
 
 namespace Application.Trainings.Queries.GetMeals
@@ -12,10 +11,10 @@ namespace Application.Trainings.Queries.GetMeals
     public class GetMealsRequestHandler : IRequestHandler<GetMealsRequest, List<SortedByDayNutrients>>
     {
         private readonly IMapper _mapper;
-        private readonly IMongoDbContext _context;
+        private readonly ITrainingDbContext _context;
         private readonly ICurrentUserService _currentUserService;
 
-        public GetMealsRequestHandler(IMapper mapper, IMongoDbContext context, ICurrentUserService currentUserService)
+        public GetMealsRequestHandler(IMapper mapper, ITrainingDbContext context, ICurrentUserService currentUserService)
         {
             _mapper = mapper;
             _context = context;
@@ -33,7 +32,7 @@ namespace Application.Trainings.Queries.GetMeals
 
             var result = new List<SortedByDayNutrients>();
             var meals = await _context.Meals
-                .Find(c => c.UserId.Equals(userId))
+                .Where(c => c.UserId.Equals(userId))
                 .ToListAsync(cancellationToken);
 
 

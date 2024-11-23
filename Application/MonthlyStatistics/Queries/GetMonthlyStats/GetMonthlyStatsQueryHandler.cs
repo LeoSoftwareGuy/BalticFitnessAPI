@@ -4,7 +4,6 @@ using Domain;
 using Domain.Nutrition;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 using Persistence.Interfaces;
 
 namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
@@ -12,9 +11,9 @@ namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
     public class GetMonthlyStatsQueryHandler : IRequestHandler<GetMonthlyStatsQuery, StatResults>
     {
         private readonly IMapper _mapper;
-        private readonly IMongoDbContext _context;
+        private readonly ITrainingDbContext _context;
         private readonly ICurrentUserService _currentUserService;
-        public GetMonthlyStatsQueryHandler(IMongoDbContext context, IMapper mapper, ICurrentUserService currentUserService)
+        public GetMonthlyStatsQueryHandler(ITrainingDbContext context, IMapper mapper, ICurrentUserService currentUserService)
         {
             _context = context;
             _mapper = mapper;
@@ -58,7 +57,7 @@ namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
         private async Task<List<Training>> GetLast30DaysWorkouts(string userId)
         {
             var trainings = await _context.Trainings
-               .Find(c => c.UserId.Equals(userId))
+               .Where(c => c.UserId.Equals(userId))
                .ToListAsync();
 
             return trainings;
@@ -68,7 +67,7 @@ namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
         private async Task<List<Meal>> GetLast30DaysMeals(string userId)
         {
             var meals = await _context.Meals
-               .Find(c => c.UserId.Equals(userId))
+               .Where(c => c.UserId.Equals(userId))
                .ToListAsync();
 
             return meals;

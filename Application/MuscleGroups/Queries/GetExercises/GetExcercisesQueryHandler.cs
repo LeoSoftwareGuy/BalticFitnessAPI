@@ -3,17 +3,16 @@ using AutoMapper;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 using Persistence.Interfaces;
 
 namespace Application.MuscleGroups.Queries.GetExercises
 {
     public class GetExcercisesQueryHandler : IRequestHandler<GetExcercisesQuery, List<ExerciseDto>>
     {
-        private IMongoDbContext _context;
+        private ITrainingDbContext _context;
         private IMapper _mapper;
 
-        public GetExcercisesQueryHandler(IMongoDbContext context, IMapper mapper)
+        public GetExcercisesQueryHandler(ITrainingDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -22,8 +21,7 @@ namespace Application.MuscleGroups.Queries.GetExercises
         public async Task<List<ExerciseDto>> Handle(GetExcercisesQuery request, CancellationToken cancellationToken)
         {
             var muscleGroup = await _context.MuscleGroups
-                       .Find(c => c.Name.Equals(request.BodyPartUrl, StringComparison.OrdinalIgnoreCase))
-                       .FirstOrDefaultAsync(cancellationToken);
+                       .FirstOrDefaultAsync(c => c.Name.Equals(request.BodyPartUrl, StringComparison.OrdinalIgnoreCase),cancellationToken);
 
             if (muscleGroup == null)
             {

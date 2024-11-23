@@ -1,7 +1,6 @@
 ﻿using Application.Support.Mappings;
 using AutoMapper;
 using Domain.Nutrition;
-using MongoDB.Bson;
 
 namespace Application.Trainings.DTOs.Nutrition
 {

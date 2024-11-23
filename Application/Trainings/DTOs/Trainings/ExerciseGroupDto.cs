@@ -6,7 +6,7 @@
     public class ExerciseGroupDto
     {
         public string Name { get; set; }
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public List<ExerciseSetDto> ExerciseSets { get; set; }
 
         public ExerciseGroupDto()

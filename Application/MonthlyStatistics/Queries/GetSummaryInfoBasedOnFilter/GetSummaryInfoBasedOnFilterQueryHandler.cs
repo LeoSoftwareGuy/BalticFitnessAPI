@@ -2,7 +2,7 @@
 using AutoMapper;
 using Domain;
 using MediatR;
-using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 
 namespace Application.MonthlyStatistics.Queries.GetSummaryInfoBasedOnFilter
@@ -10,9 +10,9 @@ namespace Application.MonthlyStatistics.Queries.GetSummaryInfoBasedOnFilter
     public class GetSummaryInfoBasedOnFilterQueryHandler : IRequestHandler<GetSummaryInfoBasedOnFilterQuery, SummaryInfoBasedOnFilter>
     {
         private readonly IMapper _mapper;
-        private readonly IMongoDbContext _context;
+        private readonly ITrainingDbContext _context;
         private readonly ICurrentUserService _currentUserService;
-        public GetSummaryInfoBasedOnFilterQueryHandler(IMongoDbContext context, IMapper mapper, ICurrentUserService currentUserService)
+        public GetSummaryInfoBasedOnFilterQueryHandler(ITrainingDbContext context, IMapper mapper, ICurrentUserService currentUserService)
         {
             _context = context;
             _mapper = mapper;
@@ -35,6 +35,13 @@ namespace Application.MonthlyStatistics.Queries.GetSummaryInfoBasedOnFilter
             {
                 var sessionsCount = trainings.Count;
                 var exercisesCount = trainings.Sum(t => t.ExerciseSets.Count);
+
+
+                //SELECT COUNT(DISTINCT e.MuscleGroupId)
+                //FROM Trainings t
+                //INNER JOIN ExerciseSets es ON t.Id = es.Training_Id
+                //INNER JOIN Exercises e ON es.Exercise_Id = e.Id;
+
                 var muscleGroupsTrained = trainings
                         .SelectMany(t => t.ExerciseSets)
                         .Select(es => es.Exercise.MuscleGroupId) 
@@ -53,28 +60,26 @@ namespace Application.MonthlyStatistics.Queries.GetSummaryInfoBasedOnFilter
 
         private async Task<List<Training>> GetAllTrainings(string userId, string filter)
         {
-            var filterDefinition = Builders<Training>.Filter.Eq(c => c.UserId, userId);
-
             DateTime startDate = filter switch
             {
-                "Week" => DateTime.Now.AddDays(-7),           // Last 7 days
-                "Month" => DateTime.Now.AddMonths(-1),        // Last 30 days
-                "All" => DateTime.MinValue,                   // All data
+                "Week" => DateTime.Now.AddDays(-7),       // Last 7 days
+                "Month" => DateTime.Now.AddMonths(-1),    // Last 30 days
+                "All" => DateTime.MinValue,               // All data
                 _ => throw new ArgumentException("Invalid filter value.")
             };
 
+            var query = _context.Trainings
+                .Where(t => t.UserId == userId);
+
             if (filter != "All")
             {
-                // Add date range to the filter for "Week" or "Month"
-                filterDefinition &= Builders<Training>.Filter.Gte(c => c.Trained, startDate);
+                query = query.Where(t => t.Trained >= startDate);
             }
 
-            // Execute the query with the applied filter
-            var trainings = await _context.Trainings
-                .Find(filterDefinition)
+            return await query
+                .Include(t => t.ExerciseSets) 
+                .ThenInclude(es => es.Exercise)  // maybe I dont need this, check client.
                 .ToListAsync();
-
-            return trainings;
         }
     }
 }

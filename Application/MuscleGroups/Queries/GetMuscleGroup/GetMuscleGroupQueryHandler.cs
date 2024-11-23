@@ -2,17 +2,17 @@
 using AutoMapper;
 using Domain;
 using MediatR;
-using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 
 namespace Application.MuscleGroups.Queries.GetMuscleGroup
 {
     public class GetMuscleGroupQueryHandler : IRequestHandler<GetMuscleGroupQuery, MuscleGroupDto>
     {
-        private readonly IMongoDbContext _context;
+        private readonly ITrainingDbContext _context;
         private readonly IMapper _mapper;
 
-        public GetMuscleGroupQueryHandler(IMongoDbContext context, IMapper mapper)
+        public GetMuscleGroupQueryHandler(ITrainingDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -20,9 +20,7 @@ namespace Application.MuscleGroups.Queries.GetMuscleGroup
         public async Task<MuscleGroupDto> Handle(GetMuscleGroupQuery request, CancellationToken cancellationToken)
         {
             var muscleGroup = await _context.MuscleGroups
-                    .Find(c => c.Id.Equals(request.Id))
-                    .FirstOrDefaultAsync();
-
+                    .FirstOrDefaultAsync(c => c.Id.Equals(request.Id));
          
             if (muscleGroup == null)
             {

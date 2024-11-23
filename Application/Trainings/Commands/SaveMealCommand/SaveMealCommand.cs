@@ -16,11 +16,11 @@ namespace Application.Trainings.Commands.SaveMealCommand
         public class SaveMealCommandHandler : IRequestHandler<SaveMealCommand, Unit>
         {
             private readonly IMapper _mapper;
-            private readonly IMongoDbContext _dbContext;
+            private readonly ITrainingDbContext _dbContext;
             private readonly IMediator _mediator;
             private readonly ICurrentUserService _currentUserService;
 
-            public SaveMealCommandHandler(IMapper mapper, IMongoDbContext dbContext, IMediator mediator, ICurrentUserService currentUserService)
+            public SaveMealCommandHandler(IMapper mapper, ITrainingDbContext dbContext, IMediator mediator, ICurrentUserService currentUserService)
             {
                 _mapper = mapper;
                 _dbContext = dbContext;
@@ -41,10 +41,10 @@ namespace Application.Trainings.Commands.SaveMealCommand
                 {
                     UserId = userId,
                     MealTime = DateTime.UtcNow,
-                    Products = consumedProducts
+                    ConsumedProducts = consumedProducts
                 };
 
-                await _dbContext.Meals.InsertOneAsync(entity, cancellationToken: cancellationToken);
+                await _dbContext.Meals.AddAsync(entity, cancellationToken: cancellationToken);
                 await _mediator.Publish(new MealAdded { UserId = entity.UserId }, cancellationToken);
 
                 return Unit.Value;

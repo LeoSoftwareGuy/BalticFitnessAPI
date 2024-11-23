@@ -2,12 +2,16 @@
 {
     public class ConsumedProduct
     {
+        public int Id { get; set; }
+        public int MealId { get; set; } 
+        public int ProductId { get; set; }
         public double Quantity { get; set; }
         public double WeightGrams { get; set; }
 
         public DateTime ConsumedAt { get; set; }
 
 
+        public Meal Meal { get; set; }
         public Product Product { get; set; }
 
         public double CalculateCalories()

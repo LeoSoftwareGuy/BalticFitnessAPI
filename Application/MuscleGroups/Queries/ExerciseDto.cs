@@ -5,7 +5,7 @@ namespace Application.MuscleGroups.Queries
 {
     public class ExerciseDto : IMapFrom<Exercise>
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public int MuscleGroupId { get; set; }
         public string Name { get; set; }
         public string ImageUrl { get; set; }

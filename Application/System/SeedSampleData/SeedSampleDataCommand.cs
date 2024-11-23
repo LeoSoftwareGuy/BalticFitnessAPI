@@ -9,8 +9,8 @@ namespace Application.System.SeedSampleData
 
     public class SeedSampleDataCommandHandler : IRequestHandler<SeedSampleDataCommand>
     {
-        private readonly IMongoDbContext _dbContext;
-        public SeedSampleDataCommandHandler(IMongoDbContext dbContext)
+        private readonly ITrainingDbContext _dbContext;
+        public SeedSampleDataCommandHandler(ITrainingDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -19,6 +19,7 @@ namespace Application.System.SeedSampleData
         {
             var seeder = new SampleDataSeeder(_dbContext);
             await seeder.SeedAllAsync(cancellationToken);
+
         }
     }
 }

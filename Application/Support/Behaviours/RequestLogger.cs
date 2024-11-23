@@ -18,7 +18,7 @@ namespace Application.Support.Behaviours
         public Task Process(TRequest request, CancellationToken cancellationToken)
         {
             var name = typeof(TRequest).Name;
-            _logger.LogInformation($"WatchBackEnd Request : {name} @{"currentUserServiceRequest"} @{request}");
+            _logger.LogInformation($"FitnessApi Request : {name} @{"currentUserServiceRequest"} @{request}");
 
             return Task.CompletedTask;
         }

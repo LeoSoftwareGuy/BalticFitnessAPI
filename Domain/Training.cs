@@ -5,6 +5,7 @@
         public Training()
         {
             ExerciseSets = new HashSet<ExerciseSet>();
+            Trained = DateTime.UtcNow;
         }
 
         public int Id { get; set; }
