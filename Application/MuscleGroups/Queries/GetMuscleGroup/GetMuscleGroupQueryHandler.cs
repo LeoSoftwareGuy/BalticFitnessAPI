@@ -20,8 +20,10 @@ namespace Application.MuscleGroups.Queries.GetMuscleGroup
         public async Task<MuscleGroupDto> Handle(GetMuscleGroupQuery request, CancellationToken cancellationToken)
         {
             var muscleGroup = await _context.MuscleGroups
+                    .Include(c => c.Exercises)
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id.Equals(request.Id));
-         
+
             if (muscleGroup == null)
             {
                 throw new NotFoundException(nameof(MuscleGroup), request.Id);

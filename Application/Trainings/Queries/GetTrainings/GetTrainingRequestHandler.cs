@@ -44,6 +44,7 @@ namespace Application.Trainings.Queries.GetTrainings
                  .Where(t => t.UserId == userId)
                  .Include(t => t.ExerciseSets)
                  .ThenInclude(e => e.Exercise)
+                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
             if (trainings.Any())

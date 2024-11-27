@@ -1,5 +1,6 @@
 ﻿using Infrastructure.Models.DTOs;
 using Infrastructure.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BalticsFitness.API.Controllers
@@ -59,6 +60,26 @@ namespace BalticsFitness.API.Controllers
                     });
 
                     return Ok(result.OutputTokens.AccessToken);
+                }
+                else
+                {
+                    return BadRequest(result.ErrorMessage);
+                }
+            }
+            return BadRequest();
+        }
+
+
+        [HttpPost("bio")]
+        [Authorize]
+        public async Task<IActionResult> BioUpdate([FromBody] BioRequest request)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _autherizationService.UpdateBioOfTheUser(request);
+                if (result.IsSuccess)
+                {
+                    return Ok();
                 }
                 else
                 {

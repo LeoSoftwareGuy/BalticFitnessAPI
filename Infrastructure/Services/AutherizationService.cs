@@ -33,11 +33,7 @@ namespace Infrastructure.Services
                 {
                     Id = Guid.NewGuid(),
                     EmailAddress = request.Email,
-                    Name = request.UserName,
-                    Surname = request.Surname,
-                    Age = request.Age,
-                    Gender = request.Gender,
-                    Nationality = request.Nationality,
+                    Name = request.Name,
                     PasswordHashed = BCrypt.Net.BCrypt.HashPassword(request.Password)
                 };
 
@@ -109,6 +105,37 @@ namespace Infrastructure.Services
         }
 
 
+        public async Task<ServiceResponse> UpdateBioOfTheUser(BioRequest bioInformation)
+        {
+            var user = await _authorizationDbContext.AppUsers
+                .FirstOrDefaultAsync(u => u.Id.Equals(_currentUserService.UserId));
+
+            if (user != null)
+            {
+                user.Nationality = bioInformation.Nationality;
+                user.Age = bioInformation.Age;
+                user.Gender = bioInformation.Gender;
+
+                _authorizationDbContext.AppUsers.Update(user);
+                var result = await _authorizationDbContext.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    return new ServiceResponse { IsSuccess = true, ErrorMessage = string.Empty };
+                }
+                else
+                {
+                    return new ServiceResponse { IsSuccess = false, ErrorMessage = "User bio update failed. No changes were made." };
+                }
+            }
+            else
+            {
+                return new ServiceResponse { IsSuccess = false, ErrorMessage = "Such user does not exist!" };
+            }
+
+
+        }
+
         public async Task DeleteRefreshToken(string refreshToken)
         {
             var token = await GetStoredRefreshTokenAsync(refreshToken);
@@ -172,6 +199,8 @@ namespace Infrastructure.Services
 
             return new OutputTokens { AccessToken = accessToken, RefreshToken = refreshToken };
         }
+
+
 
 
 

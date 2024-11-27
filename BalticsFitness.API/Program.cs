@@ -7,9 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Infrastructure;
 using Infrastructure.Models;
-using MediatR;
-using Application.System.SeedSampleData;
-using Persistence.Interfaces;
+using Microsoft.Extensions.Options;
 
 internal class Program
 {
@@ -27,6 +25,17 @@ internal class Program
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
+        // does not really work, I was able to hit url with my client even with this commented out
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowMobileUI", policy =>
+            {
+                policy.WithOrigins("http://localhost:7081", "http://192.168.1.182:7081")
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+            });
+        });
 
 
         // Load JWT settings
@@ -56,7 +65,6 @@ internal class Program
 
         var app = builder.Build();
 
-
         // Seed data at startup
         //using (var scope = app.Services.CreateScope())
         //{
@@ -80,7 +88,8 @@ internal class Program
             app.UseSwaggerUI();
         }
 
-        app.UseHttpsRedirection();
+       // app.UseCors("AllowMobileUI");
+        //app.UseHttpsRedirection();
 
         app.UseAuthentication();
         app.UseAuthorization();

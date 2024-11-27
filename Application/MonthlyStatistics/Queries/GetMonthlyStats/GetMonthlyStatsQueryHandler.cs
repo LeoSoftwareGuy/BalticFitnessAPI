@@ -58,6 +58,7 @@ namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
         {
             var trainings = await _context.Trainings
                .Where(c => c.UserId.Equals(userId))
+               .AsNoTracking()
                .ToListAsync();
 
             return trainings;
@@ -68,6 +69,7 @@ namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
         {
             var meals = await _context.Meals
                .Where(c => c.UserId.Equals(userId))
+               .AsNoTracking()
                .ToListAsync();
 
             return meals;

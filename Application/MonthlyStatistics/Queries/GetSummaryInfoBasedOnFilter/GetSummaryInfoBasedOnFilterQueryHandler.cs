@@ -79,6 +79,7 @@ namespace Application.MonthlyStatistics.Queries.GetSummaryInfoBasedOnFilter
             return await query
                 .Include(t => t.ExerciseSets) 
                 .ThenInclude(es => es.Exercise)  // maybe I dont need this, check client.
+                .AsNoTracking()
                 .ToListAsync();
         }
     }

@@ -20,8 +20,16 @@ namespace Application.MuscleGroups.Queries.GetExercises
 
         public async Task<List<ExerciseDto>> Handle(GetExcercisesQuery request, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrWhiteSpace(request.BodyPartUrl))
+            {
+                throw new ArgumentException("BodyPartUrl cannot be null or empty.", nameof(request.BodyPartUrl));
+            }
+
             var muscleGroup = await _context.MuscleGroups
-                       .FirstOrDefaultAsync(c => c.Name.Equals(request.BodyPartUrl, StringComparison.OrdinalIgnoreCase),cancellationToken);
+                            .Include(c => c.Exercises)
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(c => c.Name.ToLower() == request.BodyPartUrl.ToLower(), cancellationToken);
+ 
 
             if (muscleGroup == null)
             {
@@ -29,7 +37,6 @@ namespace Application.MuscleGroups.Queries.GetExercises
             }
 
             var exerciseDtos = _mapper.Map<List<ExerciseDto>>(muscleGroup.Exercises);
-
             return exerciseDtos;
         }
     }
