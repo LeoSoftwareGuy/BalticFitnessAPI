@@ -10,9 +10,17 @@ namespace BalticsFitness.API.Controllers
 
     public class MuscleGroups : BaseController
     {
-        [HttpGet]
+        [HttpGet()]
         [AllowAnonymous]
         public async Task<ActionResult<List<MuscleGroupDto>>> GetMuscleGroups()
+        {
+            return Ok(await Mediator.Send(new GetMuscleGroupsWithExercisesQuery()));
+        }
+
+
+        [HttpGet()]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<MuscleGroupDto>>> GetMuscleGroupsWithExercises()
         {
             return Ok(await Mediator.Send(new GetMuscleGroupsQuery()));
         }

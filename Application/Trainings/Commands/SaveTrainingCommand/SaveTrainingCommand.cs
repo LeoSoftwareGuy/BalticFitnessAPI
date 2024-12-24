@@ -1,15 +1,15 @@
-﻿using Application.Support.Interfaces;
+﻿using Application.Data;
+using Application.Support.Interfaces;
 using Application.Trainings.DTOs.Trainings;
 using AutoMapper;
 using Domain;
 using MediatR;
-using Persistence.Interfaces;
+
 
 namespace Application.Trainings.Commands.SaveTrainingCommand
 {
     public class SaveTrainingCommand : IRequest<Unit>
     {
-        public DateTime Trained { get; set; }
         public List<ExerciseSetDto> ExerciseSets { get; set; }
 
         public class SaveTrainingCommandHandler : IRequestHandler<SaveTrainingCommand, Unit>

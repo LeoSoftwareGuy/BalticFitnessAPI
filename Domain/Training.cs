@@ -13,8 +13,5 @@
         public DateTime Trained { get; set; }
 
         public ICollection<ExerciseSet> ExerciseSets { get;  set; }
-
-        public float GetTrainingsOverallReps() => ExerciseSets.Sum(t => t.Reps);
-        public float GetTrainingsOverallSets() => ExerciseSets.Count();
     }
 }

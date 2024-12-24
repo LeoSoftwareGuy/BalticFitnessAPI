@@ -1,9 +1,10 @@
-﻿using Application.Support.Interfaces;
+﻿using Application.Data;
+using Application.Support.Interfaces;
 using Application.Trainings.DTOs.Nutrition;
 using AutoMapper;
 using Domain.Nutrition;
 using MediatR;
-using Persistence.Interfaces;
+
 
 namespace Application.Trainings.Commands.SaveMealCommand
 {

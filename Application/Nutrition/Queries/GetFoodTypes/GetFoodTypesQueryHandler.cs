@@ -1,7 +1,7 @@
-﻿using AutoMapper;
+﻿using Application.Data;
+using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Interfaces;
 
 namespace Application.Nutrition.Queries.GetFoodTypes
 {

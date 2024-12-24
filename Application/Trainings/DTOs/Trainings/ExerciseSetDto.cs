@@ -10,9 +10,9 @@ namespace Application.Trainings.DTOs.Trainings
     /// </summary>
     public class ExerciseSetDto : IMapFrom<ExerciseSet>
     {
+        public int ExerciseId { get; set; } 
         public int Reps { get; set; }
         public double Weight { get; set; }
-        public int Pre { get; set; }
 
         public ExerciseDto Exercise { get; set; }
         public void Mapping(Profile profile)

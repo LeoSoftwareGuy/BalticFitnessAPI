@@ -1,9 +1,10 @@
-﻿using Application.Support.Interfaces;
+﻿using Application.Data;
+using Application.Support.Interfaces;
 using AutoMapper;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Interfaces;
+
 
 namespace Application.MonthlyStatistics.Queries.GetSummaryInfoBasedOnFilter
 {

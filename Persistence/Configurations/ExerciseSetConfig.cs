@@ -15,18 +15,16 @@ namespace Persistence.Configurations
               .IsRequired();
             builder.Property(e => e.Weight)
               .IsRequired();
-            builder.Property(e => e.Pre)
-              .IsRequired();
 
             builder.HasOne(e => e.Training)
                 .WithMany(e => e.ExerciseSets)
                 .HasForeignKey(e => e.Training_Id)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade); //means that if the Training entity is deleted, all related ExerciseSet entities will also be deleted.
 
             builder.HasOne(e => e.Exercise)
                 .WithMany(e => e.ExerciseSets)
                 .HasForeignKey(e => e.Exercise_Id)
-                .OnDelete(DeleteBehavior.Restrict);  // if exerciseSet is deleted, exercise remains the same
+                .OnDelete(DeleteBehavior.Cascade);  
         }
     }
 }

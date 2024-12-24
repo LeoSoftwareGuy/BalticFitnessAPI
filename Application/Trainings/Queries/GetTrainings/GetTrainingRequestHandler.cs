@@ -1,10 +1,11 @@
 ﻿
+using Application.Data;
 using Application.Support.Interfaces;
 using Application.Trainings.DTOs.Trainings;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Interfaces;
+
 
 namespace Application.Trainings.Queries.GetTrainings
 {

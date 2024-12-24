@@ -1,9 +1,9 @@
-﻿using Application.Support.Exceptions;
+﻿using Application.Data;
+using Application.Support.Exceptions;
 using AutoMapper;
 using Domain.Nutrition;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Interfaces;
 
 namespace Application.Nutrition.Queries.GetFoodType
 {

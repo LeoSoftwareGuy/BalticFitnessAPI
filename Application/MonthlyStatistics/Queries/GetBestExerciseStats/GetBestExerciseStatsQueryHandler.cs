@@ -1,8 +1,8 @@
-﻿using Application.Support.Interfaces;
+﻿using Application.Data;
+using Application.Support.Interfaces;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Interfaces;
 
 namespace Application.MonthlyStatistics.Queries.GetBestExerciseStats
 {
@@ -26,7 +26,7 @@ namespace Application.MonthlyStatistics.Queries.GetBestExerciseStats
                 throw new UnauthorizedAccessException("User is not authenticated.");
             }
 
-            // SELET t.Id as TrainingId, MAX(es.Weight) as MaxWeight, MAX(es.Reps) as MaxReps, e.Name as ExerciseName
+            // SELET t.Id as TrainingId, MAX(es.Weight) as MaxWeight, MAX(es.Reps) as MaxReps, e.Name as ExerciseName,COUNT(*) AS Sets
             // FROM ExerciseSets es 
             // INNER JOIN Trainings t ON es.Training_Id = t.Id
             // INNER JOIN Exercises e ON es.Exercise_Id = e.Id
@@ -36,16 +36,18 @@ namespace Application.MonthlyStatistics.Queries.GetBestExerciseStats
             // LIMIT 1;
 
             var bestExerciseStats = await _context.ExerciseSets
+                .AsNoTracking()
                 .Include(t => t.Training)
                 .Include(e => e.Exercise)
                 .Where(es => es.Exercise_Id == request.ExerciseId && es.Training.UserId == userId)
                 .GroupBy(t => t.Training_Id)
-                .Select(group => new 
+                .Select(group => new
                 {
                     TrainingId = group.Key,
                     MaxWeight = group.Max(t => t.Weight),
                     MaxReps = group.Max(t => t.Reps),
-                    ExerciseName = group.First().Exercise.Name
+                    ExerciseName = group.First().Exercise.Name,
+                    Sets = group.Count(t => t.Exercise_Id == request.ExerciseId)
                 })
                 .OrderByDescending(es => es.MaxWeight)
                 .ThenByDescending(es => es.MaxReps)
@@ -61,7 +63,8 @@ namespace Application.MonthlyStatistics.Queries.GetBestExerciseStats
                 ExerciseName = bestExerciseStats.ExerciseName,
                 TrainingId = bestExerciseStats.TrainingId,
                 Weight = bestExerciseStats.MaxWeight.ToString(),
-                Reps = bestExerciseStats.MaxReps
+                Reps = bestExerciseStats.MaxReps,
+                Sets = bestExerciseStats.Sets
             };
         }
     }

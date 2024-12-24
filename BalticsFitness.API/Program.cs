@@ -8,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using Infrastructure;
 using Infrastructure.Models;
 using Microsoft.Extensions.Options;
+using MediatR;
+using Application.System.SeedSampleData;
 
 internal class Program
 {
@@ -27,15 +29,15 @@ internal class Program
         builder.Services.AddSwaggerGen();
 
         // does not really work, I was able to hit url with my client even with this commented out
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowMobileUI", policy =>
-            {
-                policy.WithOrigins("http://localhost:7081", "http://192.168.1.182:7081")
-                      .AllowAnyMethod()
-                      .AllowAnyHeader();
-            });
-        });
+        //builder.Services.AddCors(options =>
+        //{
+        //    options.AddPolicy("AllowMobileUI", policy =>
+        //    {
+        //        policy.WithOrigins("http://localhost:7081", "http://192.168.1.182:7081")
+        //              .AllowAnyMethod()
+        //              .AllowAnyHeader();
+        //    });
+        //});
 
 
         // Load JWT settings
@@ -65,21 +67,21 @@ internal class Program
 
         var app = builder.Build();
 
-        // Seed data at startup
-        //using (var scope = app.Services.CreateScope())
-        //{
-        //    var services = scope.ServiceProvider;
-        //    try
-        //    {
-        //        var mediator = services.GetRequiredService<IMediator>();
-        //        await mediator.Send(new SeedSampleDataCommand(), CancellationToken.None);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var logger = services.GetRequiredService<ILogger<Program>>();
-        //        logger.LogError(ex, "An error occurred while migrating or initializing the database.");
-        //    }
-        //}
+         //Seed data at startup
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            try
+            {
+                var mediator = services.GetRequiredService<IMediator>();
+                await mediator.Send(new SeedSampleDataCommand(), CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred while migrating or initializing the database.");
+            }
+        }
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

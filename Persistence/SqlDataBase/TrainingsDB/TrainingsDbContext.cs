@@ -1,7 +1,7 @@
-﻿using Domain;
+﻿using Application.Data;
+using Domain;
 using Domain.Nutrition;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Interfaces;
 
 namespace Persistence.SqlDataBase.TrainingsDB
 {

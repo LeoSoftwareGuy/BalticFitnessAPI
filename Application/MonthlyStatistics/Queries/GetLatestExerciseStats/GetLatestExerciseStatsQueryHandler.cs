@@ -1,10 +1,8 @@
-﻿using Application.Support.Interfaces;
+﻿using Application.Data;
+using Application.Support.Interfaces;
 using AutoMapper;
-using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Interfaces;
-using System.Collections.Generic;
 
 
 namespace Application.MonthlyStatistics.Queries.GetLatestExerciseStats
@@ -39,9 +37,9 @@ namespace Application.MonthlyStatistics.Queries.GetLatestExerciseStats
             // WHERE t.UserId = userId AND es.Exercise_Id = request.ExerciseId
             // ORDER BY t.Trained DESC
             // LIMIT 1;
-             
 
             var latestExercuseStats = await _context.ExerciseSets
+                .AsNoTracking()
                 .Include(es => es.Training)
                 .Include(es => es.Exercise)
                 .Where(es => es.Training.UserId == userId && es.Exercise_Id == request.ExerciseId)
@@ -58,7 +56,7 @@ namespace Application.MonthlyStatistics.Queries.GetLatestExerciseStats
                 ExerciseName = latestExercuseStats.Exercise.Name,
                 TrainingId = latestExercuseStats.Training.Id,
                 Weight = latestExercuseStats.Weight.ToString(),
-                Sets= latestExercuseStats.
+                Sets = latestExercuseStats.Training.ExerciseSets.Count(c => c.Exercise_Id.Equals(request.ExerciseId)),
                 Reps = latestExercuseStats.Reps
             };
 

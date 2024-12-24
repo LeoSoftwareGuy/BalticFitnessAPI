@@ -1,6 +1,6 @@
-﻿using AutoMapper;
+﻿using Application.Data;
+using AutoMapper;
 using Domain;
-using Persistence.Interfaces;
 
 namespace Application.System.SeedSampleData
 {

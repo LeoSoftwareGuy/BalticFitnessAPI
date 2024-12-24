@@ -2,7 +2,7 @@
 {
     public class StatResults
     {
-        public Dictionary<string, double> BestWorkingWeightPerExercise { get; set; } = new();
+        public Dictionary<string, string> BestWorkingWeightPerExercise { get; set; } = new();
         public double AverageAmountOfRepsPerTraining { get; set; } = 0.0f;
         public double AverageAmountOfSetsPerTraining { get; set; } = 0.0f;
         public double AverageAmountOfCaloriesPerDay { get; set; } = 0.0;

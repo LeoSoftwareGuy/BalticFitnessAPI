@@ -21,7 +21,7 @@ namespace Persistence.Configurations
             builder.HasMany(e => e.Exercises)
                 .WithOne(e => e.MuscleGroup)
                 .HasForeignKey(e => e.MuscleGroupId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

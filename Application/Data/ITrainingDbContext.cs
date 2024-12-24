@@ -1,8 +1,8 @@
-﻿using Domain;
-using Domain.Nutrition;
+﻿using Domain.Nutrition;
+using Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Persistence.Interfaces
+namespace Application.Data
 {
     public interface ITrainingDbContext
     {

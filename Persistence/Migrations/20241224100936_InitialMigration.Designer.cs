@@ -12,15 +12,15 @@ using Persistence.SqlDataBase.TrainingsDB;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(TrainingsDbContext))]
-    [Migration("20241123151930_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241224100936_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -60,9 +60,6 @@ namespace Persistence.Migrations
                     b.Property<int>("Exercise_Id")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Pre")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Reps")
                         .HasColumnType("integer")
                         .HasColumnName("RepetitionsDuringSet");
@@ -70,8 +67,9 @@ namespace Persistence.Migrations
                     b.Property<int>("Training_Id")
                         .HasColumnType("integer");
 
-                    b.Property<double>("Weight")
-                        .HasColumnType("double precision");
+                    b.Property<string>("Weight")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -246,7 +244,7 @@ namespace Persistence.Migrations
                     b.HasOne("Domain.MuscleGroup", "MuscleGroup")
                         .WithMany("Exercises")
                         .HasForeignKey("MuscleGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("MuscleGroup");
@@ -257,7 +255,7 @@ namespace Persistence.Migrations
                     b.HasOne("Domain.Exercise", "Exercise")
                         .WithMany("ExerciseSets")
                         .HasForeignKey("Exercise_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Training", "Training")

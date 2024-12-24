@@ -1,5 +1,5 @@
-﻿using MediatR;
-using Persistence.Interfaces;
+﻿using Application.Data;
+using MediatR;
 
 namespace Application.System.SeedSampleData
 {

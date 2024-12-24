@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -107,8 +107,7 @@ namespace Persistence.Migrations
                         name: "FK_Exercises_MuscleGroups_MuscleGroupId",
                         column: x => x.MuscleGroupId,
                         principalTable: "MuscleGroups",
-                        principalColumn: "MuscleGroupId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "MuscleGroupId");
                 });
 
             migrationBuilder.CreateTable(
@@ -149,8 +148,7 @@ namespace Persistence.Migrations
                     Training_Id = table.Column<int>(type: "integer", nullable: false),
                     Exercise_Id = table.Column<int>(type: "integer", nullable: false),
                     RepetitionsDuringSet = table.Column<int>(type: "integer", nullable: false),
-                    Weight = table.Column<double>(type: "double precision", nullable: false),
-                    Pre = table.Column<int>(type: "integer", nullable: false)
+                    Weight = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -160,7 +158,7 @@ namespace Persistence.Migrations
                         column: x => x.Exercise_Id,
                         principalTable: "Exercises",
                         principalColumn: "ExerciseId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ExerciseSets_Trainings_Training_Id",
                         column: x => x.Training_Id,
