@@ -34,9 +34,9 @@ namespace BalticsFitness.API.Controllers
 
         [HttpGet("{bodyPartUrl}")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<ExerciseDto>>> GetExercisesForMuscleGroup(string bodyPartUrl)
+        public async Task<ActionResult<List<ExerciseDto>>> GetExercisesForMuscleGroup(int id)
         {
-            return Ok(await Mediator.Send(new GetExcercisesQuery { BodyPartUrl = bodyPartUrl }));
+            return Ok(await Mediator.Send(new GetExcercisesQuery { MuscleGroupId = id }));
         }
     }
 }

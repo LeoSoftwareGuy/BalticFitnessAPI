@@ -1,10 +1,10 @@
 ﻿using Application.Support.Interfaces;
+using Domain.Authentication;
+using Infrastructure.Data;
 using Infrastructure.Models;
 using Infrastructure.Models.DTOs;
 using Infrastructure.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Interfaces;
-using Persistence.SqlDataBase.AuthorizationDB.Models;
 using System.Security.Claims;
 
 namespace Infrastructure.Services

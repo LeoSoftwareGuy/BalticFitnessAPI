@@ -27,7 +27,7 @@ namespace Application.MuscleGroups.Queries.GetMuscleGroup
 
             if (muscleGroup == null)
             {
-                throw new NotFoundException(nameof(MuscleGroup), request.Id);
+                throw new MuscleGroupNotFoundException(nameof(MuscleGroup), request.Id);
             }
 
             return _mapper.Map<MuscleGroupDto>(muscleGroup);

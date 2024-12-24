@@ -1,6 +1,6 @@
-﻿using Infrastructure.Models;
+﻿using Domain.Authentication;
+using Infrastructure.Models;
 using Infrastructure.Models.DTOs;
-using Persistence.SqlDataBase.AuthorizationDB.Models;
 
 namespace Infrastructure.Services.Interfaces
 {

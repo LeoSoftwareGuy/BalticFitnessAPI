@@ -1,9 +1,8 @@
-﻿
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Persistence.SqlDataBase.AuthorizationDB.Models;
+using Domain.Authentication;
 
-namespace Persistence.Interfaces
+namespace Infrastructure.Data
 {
     public interface IAuthorizationDbContext
     {
@@ -18,3 +17,4 @@ namespace Persistence.Interfaces
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }
+

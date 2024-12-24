@@ -4,6 +4,6 @@ namespace Application.MuscleGroups.Queries.GetExercises
 {
     public class GetExcercisesQuery : IRequest<List<ExerciseDto>>
     {
-        public string BodyPartUrl { get; set; }
+        public int MuscleGroupId { get; set; }
     }
 }

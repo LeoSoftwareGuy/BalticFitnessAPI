@@ -25,14 +25,14 @@ namespace Application.Nutrition.Queries.GetFoodProducts
 
             if (foodType == null)
             {
-                throw new NotFoundException(nameof(FoodTypeDto), request.FoodTypeUrl);
+                throw new FoodTypeNotFoundException(nameof(FoodTypeDto), request.FoodTypeUrl);
             }
 
 
             var products = foodType.Products;
             if (products.Count.Equals(0) || products == null)
             {
-                throw new EmptyCollectionException("Products", products);
+                throw new ProductsNotFoundException(nameof(products), request.FoodTypeUrl);
             }
 
             var productDtos = _mapper.Map<List<ProductDto>>(products);

@@ -1,12 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace Persistence.SqlDataBase.AuthorizationDB.Models
+﻿namespace Domain.Authentication
 {
     public class AppUser
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
@@ -17,3 +12,4 @@ namespace Persistence.SqlDataBase.AuthorizationDB.Models
         public string Gender { get; set; }
     }
 }
+

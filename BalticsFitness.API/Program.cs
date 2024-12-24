@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Infrastructure;
 using Infrastructure.Models;
-using Microsoft.Extensions.Options;
 using MediatR;
 using Application.System.SeedSampleData;
+using BalticsFitness.API;
 
 internal class Program
 {
@@ -17,9 +17,11 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddPersistence(builder.Configuration);
-        builder.Services.AddApplication();
-        builder.Services.AddInfrastructure(builder.Configuration);
+        builder.Services
+            .AddPersistence(builder.Configuration)
+            .AddApplication()
+            .AddInfrastructure(builder.Configuration)
+            .AddApiServices(builder.Configuration);
 
         builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
@@ -67,7 +69,8 @@ internal class Program
 
         var app = builder.Build();
 
-         //Seed data at startup
+        app.UseApiServices();
+        //Seed data at startup
         using (var scope = app.Services.CreateScope())
         {
             var services = scope.ServiceProvider;

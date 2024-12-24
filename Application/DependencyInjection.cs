@@ -1,10 +1,6 @@
 ﻿using Application.Support;
-using Application.Support.Behaviours;
 using Application.Support.Interfaces;
-using Application.Trainings.Commands.SaveMealCommand;
-using Application.Trainings.Commands.SaveTrainingCommand;
-using FluentValidation;
-using MediatR;
+using BuildingBlocks.Behaviors;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -14,15 +10,20 @@ namespace Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            services.AddTransient<INotificationService, NotificationService>();
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+            services.AddMediatR(config =>
+            {
+                config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+                config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+                config.AddOpenBehavior(typeof(LoggingBehavior<,>));
+            });
 
-            services.AddValidatorsFromAssemblyContaining<SaveMealCommandValidator>();
+            services.AddTransient<INotificationService, NotificationService>();
+
+           // services.AddValidatorsFromAssemblyContaining<SaveMealCommandValidator>();
             //services.AddValidatorsFromAssemblyContaining<SaveTrainingCommandValidator>();
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+      
             return services;
         }
     }

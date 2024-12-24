@@ -24,7 +24,7 @@ namespace Application.Nutrition.Queries.GetFoodType
 
             if (foodType == null)
             {
-                throw new NotFoundException(nameof(FoodType), request.Id);
+                throw new FoodTypeNotFoundException(nameof(FoodType), request.Id);
             }
 
             return _mapper.Map<FoodTypeDto>(foodType);

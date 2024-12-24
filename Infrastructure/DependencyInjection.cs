@@ -1,9 +1,9 @@
-﻿using Infrastructure.Models;
+﻿using BuildingBlocks.Exceptions.Handler;
+using Infrastructure.Models;
 using Infrastructure.Services;
 using Infrastructure.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Infrastructure
 {
@@ -19,6 +19,11 @@ namespace Infrastructure
             });
 
             services.AddTransient<IAutherizationService, AutherizationService>();
+
+            services.AddExceptionHandler<CustomExceptionHandler>();
+            services.AddHealthChecks()
+             .AddNpgSql((configuration.GetConnectionString("AuthorizationConnection")!));
+
             return services;
         }
     }

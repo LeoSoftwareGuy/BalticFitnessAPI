@@ -1,9 +1,9 @@
 ﻿
 using Application.Data;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Interfaces;
 using Persistence.SqlDataBase.AuthorizationDB;
 using Persistence.SqlDataBase.TrainingsDB;
 

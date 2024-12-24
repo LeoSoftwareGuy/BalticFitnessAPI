@@ -1,4 +1,4 @@
-﻿namespace Persistence.SqlDataBase.AuthorizationDB.Models
+﻿namespace Domain.Authentication
 {
     public class RefreshTokens
     {

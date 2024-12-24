@@ -1,7 +1,7 @@
-﻿
-using Microsoft.EntityFrameworkCore;
-using Persistence.Interfaces;
-using Persistence.SqlDataBase.AuthorizationDB.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Infrastructure.Data;
+using Domain.Authentication;
+using Persistence.Configurations;
 
 namespace Persistence.SqlDataBase.AuthorizationDB
 {
@@ -12,6 +12,11 @@ namespace Persistence.SqlDataBase.AuthorizationDB
         public AuthorizationDbContext(DbContextOptions<AuthorizationDbContext> options) : base(options)
         {
             
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new AppUserConfig());
         }
     }
 }
