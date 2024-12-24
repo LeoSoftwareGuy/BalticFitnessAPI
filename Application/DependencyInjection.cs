@@ -19,9 +19,6 @@ namespace Application
 
             services.AddTransient<INotificationService, NotificationService>();
 
-           // services.AddValidatorsFromAssemblyContaining<SaveMealCommandValidator>();
-            //services.AddValidatorsFromAssemblyContaining<SaveTrainingCommandValidator>();
-
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
       
             return services;

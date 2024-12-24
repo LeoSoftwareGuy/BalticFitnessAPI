@@ -16,7 +16,7 @@ namespace Application.Trainings.Commands.SaveTrainingCommand
         {
             public ExerciseSetDtoValidator()
             {
-                RuleFor(x => x.Exercise_Id).NotNull().NotEmpty().WithMessage("ExerciseId must be greater than 0.");
+                RuleFor(x => x.ExerciseId).NotNull().NotEmpty().WithMessage("ExerciseId must be greater than 0.");
                 RuleFor(x => x.Reps).InclusiveBetween(1, 100).WithMessage("Reps number must be between 1 - 100");
                 RuleFor(x => x.Weight).InclusiveBetween(1, 400).WithMessage("Weight number must be between 1 - 1000.");
             }

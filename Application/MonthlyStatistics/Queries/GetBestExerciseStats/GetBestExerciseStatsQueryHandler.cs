@@ -39,15 +39,15 @@ namespace Application.MonthlyStatistics.Queries.GetBestExerciseStats
                 .AsNoTracking()
                 .Include(t => t.Training)
                 .Include(e => e.Exercise)
-                .Where(es => es.Exercise_Id == request.ExerciseId && es.Training.UserId == userId)
-                .GroupBy(t => t.Training_Id)
+                .Where(es => es.ExerciseId == request.ExerciseId && es.Training.UserId == userId)
+                .GroupBy(t => t.TrainingId)
                 .Select(group => new
                 {
                     TrainingId = group.Key,
                     MaxWeight = group.Max(t => t.Weight),
                     MaxReps = group.Max(t => t.Reps),
                     ExerciseName = group.First().Exercise.Name,
-                    Sets = group.Count(t => t.Exercise_Id == request.ExerciseId)
+                    Sets = group.Count(t => t.ExerciseId == request.ExerciseId)
                 })
                 .OrderByDescending(es => es.MaxWeight)
                 .ThenByDescending(es => es.MaxReps)

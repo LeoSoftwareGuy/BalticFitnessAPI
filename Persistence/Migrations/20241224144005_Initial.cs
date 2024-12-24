@@ -4,32 +4,14 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Persistence.Migrations.TrainingsDb
+namespace Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class TrainingDateTimeWithTimeZone : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "AppUser",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Surname = table.Column<string>(type: "text", nullable: false),
-                    EmailAddress = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    PasswordHashed = table.Column<string>(type: "text", nullable: false),
-                    Nationality = table.Column<string>(type: "text", nullable: false),
-                    Age = table.Column<int>(type: "integer", nullable: false),
-                    Gender = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AppUser", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "FoodTypes",
                 columns: table => new
@@ -219,9 +201,6 @@ namespace Persistence.Migrations.TrainingsDb
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "AppUser");
-
             migrationBuilder.DropTable(
                 name: "ConsumedProducts");
 

@@ -18,12 +18,12 @@ namespace Persistence.Configurations
 
             builder.HasOne(e => e.Training)
                 .WithMany(e => e.ExerciseSets)
-                .HasForeignKey(e => e.Training_Id)
+                .HasForeignKey(e => e.TrainingId)
                 .OnDelete(DeleteBehavior.Cascade); //means that if the Training entity is deleted, all related ExerciseSet entities will also be deleted.
 
             builder.HasOne(e => e.Exercise)
                 .WithMany(e => e.ExerciseSets)
-                .HasForeignKey(e => e.Exercise_Id)
+                .HasForeignKey(e => e.ExerciseId)
                 .OnDelete(DeleteBehavior.Cascade);  
         }
     }

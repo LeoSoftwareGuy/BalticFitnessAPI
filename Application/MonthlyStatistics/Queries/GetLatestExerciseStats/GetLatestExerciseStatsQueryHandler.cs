@@ -42,7 +42,7 @@ namespace Application.MonthlyStatistics.Queries.GetLatestExerciseStats
                 .AsNoTracking()
                 .Include(es => es.Training)
                 .Include(es => es.Exercise)
-                .Where(es => es.Training.UserId == userId && es.Exercise_Id == request.ExerciseId)
+                .Where(es => es.Training.UserId == userId && es.ExerciseId == request.ExerciseId)
                 .OrderByDescending(es => es.Training.Trained)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -56,7 +56,7 @@ namespace Application.MonthlyStatistics.Queries.GetLatestExerciseStats
                 ExerciseName = latestExercuseStats.Exercise.Name,
                 TrainingId = latestExercuseStats.Training.Id,
                 Weight = latestExercuseStats.Weight.ToString(),
-                Sets = latestExercuseStats.Training.ExerciseSets.Count(c => c.Exercise_Id.Equals(request.ExerciseId)),
+                Sets = latestExercuseStats.Training.ExerciseSets.Count(c => c.ExerciseId.Equals(request.ExerciseId)),
                 Reps = latestExercuseStats.Reps
             };
 

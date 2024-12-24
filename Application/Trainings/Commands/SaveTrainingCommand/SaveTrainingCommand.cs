@@ -41,7 +41,7 @@ namespace Application.Trainings.Commands.SaveTrainingCommand
                 var exerciseSets = _mapper.Map<List<ExerciseSet>>(request.ExerciseSets);
 
                 // Fetch all required exercises in one go
-                var exerciseIds = exerciseSets.Select(e => e.Exercise_Id).Distinct();
+                var exerciseIds = exerciseSets.Select(e => e.ExerciseId).Distinct();
                 var existingExercises = await _context.Exercises
                     .Where(e => exerciseIds.Contains(e.Id))
                     .ToDictionaryAsync(e => e.Id, cancellationToken);
@@ -49,13 +49,13 @@ namespace Application.Trainings.Commands.SaveTrainingCommand
                 // Attach exercises to ExerciseSets
                 foreach (var set in exerciseSets)
                 {
-                    if (existingExercises.TryGetValue(set.Exercise_Id, out var exercise))
+                    if (existingExercises.TryGetValue(set.ExerciseId, out var exercise))
                     {
                         set.Exercise = exercise;
                     }
                     else
                     {
-                        throw new KeyNotFoundException($"Exercise with Id {set.Exercise_Id} not found.");
+                        throw new KeyNotFoundException($"Exercise with Id {set.ExerciseId} not found.");
                     }
                 }
 
