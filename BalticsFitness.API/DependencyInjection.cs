@@ -11,7 +11,7 @@ namespace BalticsFitness.API
         {
             services.AddExceptionHandler<CustomExceptionHandler>();
             services.AddHealthChecks()
-             .AddNpgSql((configuration.GetConnectionString("TrainingsConnection")!));
+              .AddNpgSql(configuration.GetConnectionString("TrainingsConnection")!, name: "trainings_npgsql");
 
             return services;
         }

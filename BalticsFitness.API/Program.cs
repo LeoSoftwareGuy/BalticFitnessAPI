@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Infrastructure;
 using Infrastructure.Models;
-using MediatR;
-using Application.System.SeedSampleData;
 using BalticsFitness.API;
 
 internal class Program
@@ -70,27 +68,13 @@ internal class Program
         var app = builder.Build();
 
         app.UseApiServices();
-        //Seed data at startup
-        using (var scope = app.Services.CreateScope())
-        {
-            var services = scope.ServiceProvider;
-            try
-            {
-                var mediator = services.GetRequiredService<IMediator>();
-                await mediator.Send(new SeedSampleDataCommand(), CancellationToken.None);
-            }
-            catch (Exception ex)
-            {
-                var logger = services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(ex, "An error occurred while migrating or initializing the database.");
-            }
-        }
-
+ 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
+            await app.InitialiseDatabaseAsync();
         }
 
        // app.UseCors("AllowMobileUI");

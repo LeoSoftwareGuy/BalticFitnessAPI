@@ -22,7 +22,8 @@ namespace Infrastructure
 
             services.AddExceptionHandler<CustomExceptionHandler>();
             services.AddHealthChecks()
-             .AddNpgSql((configuration.GetConnectionString("AuthorizationConnection")!));
+                     .AddNpgSql(configuration.GetConnectionString("AuthorizationConnection")!, name: "authorization_npgsql");
+
 
             return services;
         }
