@@ -10,11 +10,10 @@ namespace Application.Trainings.DTOs.Trainings
     /// </summary>
     public class ExerciseSetDto : IMapFrom<ExerciseSet>
     {
-        public int ExerciseId { get; set; } 
+        public int Exercise_Id { get; set; } 
         public int Reps { get; set; }
         public double Weight { get; set; }
 
-        public ExerciseDto Exercise { get; set; }
         public void Mapping(Profile profile)
         {
             profile.CreateMap<ExerciseSet, ExerciseSetDto>().ReverseMap(); // This enables mapping in both directions;

@@ -34,7 +34,12 @@ namespace Infrastructure.Services
                     Id = Guid.NewGuid(),
                     EmailAddress = request.Email,
                     Name = request.Name,
-                    PasswordHashed = BCrypt.Net.BCrypt.HashPassword(request.Password)
+                    PasswordHashed = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                    Surname = "To be added",
+                    Nationality = "To be added",
+                    Age = 0,
+                    Gender = "To be added"
+
                 };
 
                 OutputTokens tokens = null;

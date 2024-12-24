@@ -15,7 +15,7 @@ namespace Persistence.Configurations
             .ValueGeneratedOnAdd();
       
             builder.Property(e => e.Trained)
-             .HasColumnType("timestamp")
+             .HasColumnType("timestamp with time zone")
              .IsRequired();
 
             builder.Property(e => e.UserId).IsRequired();

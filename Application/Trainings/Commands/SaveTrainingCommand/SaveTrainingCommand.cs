@@ -4,6 +4,7 @@ using Application.Trainings.DTOs.Trainings;
 using AutoMapper;
 using Domain;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Application.Trainings.Commands.SaveTrainingCommand
@@ -36,16 +37,38 @@ namespace Application.Trainings.Commands.SaveTrainingCommand
                     throw new UnauthorizedAccessException("User is not authenticated.");
                 }
 
+                // Map incoming DTOs to ExerciseSet entities
                 var exerciseSets = _mapper.Map<List<ExerciseSet>>(request.ExerciseSets);
 
+                // Fetch all required exercises in one go
+                var exerciseIds = exerciseSets.Select(e => e.Exercise_Id).Distinct();
+                var existingExercises = await _context.Exercises
+                    .Where(e => exerciseIds.Contains(e.Id))
+                    .ToDictionaryAsync(e => e.Id, cancellationToken);
+
+                // Attach exercises to ExerciseSets
+                foreach (var set in exerciseSets)
+                {
+                    if (existingExercises.TryGetValue(set.Exercise_Id, out var exercise))
+                    {
+                        set.Exercise = exercise;
+                    }
+                    else
+                    {
+                        throw new KeyNotFoundException($"Exercise with Id {set.Exercise_Id} not found.");
+                    }
+                }
+
+                // Create new Training entity
                 var entity = new Training
                 {
                     UserId = userId,
                     ExerciseSets = exerciseSets
                 };
 
-                await _context.Trainings.AddAsync(entity, cancellationToken: cancellationToken);
-                await _context.SaveChangesAsync(cancellationToken: cancellationToken);
+                await _context.Trainings.AddAsync(entity, cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
+                // Notify other parts of the system
                 await _mediator.Publish(new TrainingAdded { UserId = entity.UserId }, cancellationToken);
 
                 return Unit.Value;

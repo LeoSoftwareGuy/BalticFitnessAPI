@@ -14,15 +14,15 @@ namespace BalticsFitness.API.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<List<MuscleGroupDto>>> GetMuscleGroups()
         {
-            return Ok(await Mediator.Send(new GetMuscleGroupsWithExercisesQuery()));
+            return Ok(await Mediator.Send(new GetMuscleGroupsQuery()));
         }
 
 
         [HttpGet()]
         [AllowAnonymous]
         public async Task<ActionResult<List<MuscleGroupDto>>> GetMuscleGroupsWithExercises()
-        {
-            return Ok(await Mediator.Send(new GetMuscleGroupsQuery()));
+        {      
+            return Ok(await Mediator.Send(new GetMuscleGroupsWithExercisesQuery()));
         }
 
         [HttpGet("{id}")]
@@ -32,7 +32,7 @@ namespace BalticsFitness.API.Controllers
             return Ok(await Mediator.Send(new GetMuscleGroupQuery { Id = id }));
         }
 
-        [HttpGet("{bodyPartUrl}")]
+        [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<ActionResult<List<ExerciseDto>>> GetExercisesForMuscleGroup(int id)
         {
