@@ -8,11 +8,14 @@ namespace Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<AppUser> builder)
         {
+            builder.ToTable("appUsers");
             builder.HasKey(c => c.Id);
-            builder.Property(c => c.Id).ValueGeneratedNever();
-            builder.Property(c => c.EmailAddress).IsRequired().HasMaxLength(50);
-            builder.Property(c => c.Name).IsRequired().HasMaxLength(50);
-            builder.Property(c => c.PasswordHashed).IsRequired();
+            builder.Property(c => c.Id)
+                .HasColumnName("userId")
+                .ValueGeneratedNever();
+            builder.Property(c => c.EmailAddress).HasColumnName("emailAddress").IsRequired().HasMaxLength(50);
+            builder.Property(c => c.Name).HasColumnName("userName").IsRequired().HasMaxLength(50);
+            builder.Property(c => c.PasswordHashed).HasColumnName("passwordHashed").IsRequired();
         }
     }
 }

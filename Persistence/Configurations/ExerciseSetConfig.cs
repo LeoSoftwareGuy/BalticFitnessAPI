@@ -8,12 +8,19 @@ namespace Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<ExerciseSet> builder)
         {
+            builder.ToTable("exerciseSets");
             builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.Id).ValueGeneratedOnAdd();
-            builder.Property(e => e.Reps).HasColumnName("RepetitionsDuringSet")
+            builder.Property(e => e.Id)
+                .HasColumnName("exerciseSetId")
+                .ValueGeneratedOnAdd();
+
+            builder.Property(e => e.Reps)
+              .HasColumnName("reps")
               .IsRequired();
+
             builder.Property(e => e.Weight)
+              .HasColumnName("weight")
               .IsRequired();
 
             builder.HasOne(e => e.Training)
@@ -24,7 +31,7 @@ namespace Persistence.Configurations
             builder.HasOne(e => e.Exercise)
                 .WithMany(e => e.ExerciseSets)
                 .HasForeignKey(e => e.ExerciseId)
-                .OnDelete(DeleteBehavior.Cascade);  
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -8,15 +8,23 @@ namespace Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Exercise> builder)
         {
+            builder.ToTable("exercises");
             builder.HasKey(x => x.Id);
             builder.Property(x=> x.Id)
-                .HasColumnName("ExerciseId")
+                .HasColumnName("exerciseId")
                 .ValueGeneratedNever();
 
-            builder.Property(x => x.Id).ValueGeneratedNever();
-            builder.Property(x => x.MuscleGroupId).IsRequired();
-            builder.Property(x => x.Name).IsRequired();
-            builder.Property(x => x.ImageUrl).IsRequired();
+            builder.Property(x => x.MuscleGroupId)
+                .HasColumnName("muscleGroupId")
+                .IsRequired();
+
+            builder.Property(x => x.Name)
+                .HasColumnName("name")
+                .IsRequired();
+
+            builder.Property(x => x.ImageUrl)
+                .HasColumnName("imageUrl")
+                .IsRequired();
 
             builder.HasOne(e => e.MuscleGroup)
                 .WithMany(e => e.Exercises)

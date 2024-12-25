@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Persistence.SqlDataBase.TrainingsDB;
 
 #nullable disable
 
-namespace Persistence.Migrations
+namespace Persistence.Migrations.TrainingsDb
 {
     [DbContext(typeof(TrainingsDbContext))]
-    partial class TrainingsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241225095612_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,120 +28,138 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.Authentication.AppUser", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<int>("Age")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("age");
 
                     b.Property<string>("EmailAddress")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("emailaddress");
 
                     b.Property<string>("Gender")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("gender");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("name");
 
                     b.Property<string>("Nationality")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("nationality");
 
                     b.Property<string>("PasswordHashed")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("passwordhashed");
 
                     b.Property<string>("Surname")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("surname");
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppUser");
+                    b.ToTable("appUsers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Exercise", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("integer")
-                        .HasColumnName("ExerciseId");
+                        .HasColumnName("id");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("imageurl");
 
                     b.Property<int>("MuscleGroupId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("musclegroupid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MuscleGroupId");
 
-                    b.ToTable("Exercises");
+                    b.ToTable("exercises", (string)null);
                 });
 
             modelBuilder.Entity("Domain.ExerciseSet", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Exercise_Id")
-                        .HasColumnType("integer");
+                    b.Property<int>("ExerciseId")
+                        .HasColumnType("integer")
+                        .HasColumnName("exerciseid");
 
                     b.Property<int>("Reps")
                         .HasColumnType("integer")
-                        .HasColumnName("RepetitionsDuringSet");
+                        .HasColumnName("reps");
 
-                    b.Property<int>("Training_Id")
-                        .HasColumnType("integer");
+                    b.Property<int>("TrainingId")
+                        .HasColumnType("integer")
+                        .HasColumnName("trainingid");
 
                     b.Property<string>("Weight")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("weight");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Exercise_Id");
+                    b.HasIndex("ExerciseId");
 
-                    b.HasIndex("Training_Id");
+                    b.HasIndex("TrainingId");
 
-                    b.ToTable("ExerciseSets");
+                    b.ToTable("exerciseSets", (string)null);
                 });
 
             modelBuilder.Entity("Domain.MuscleGroup", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("integer")
-                        .HasColumnName("MuscleGroupId");
+                        .HasColumnName("id");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("imageurl");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("name");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("type");
 
                     b.HasKey("Id");
 
-                    b.ToTable("MuscleGroups");
+                    b.ToTable("muscles", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Nutrition.ConsumedProduct", b =>
@@ -146,24 +167,29 @@ namespace Persistence.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("ConsumedProductId");
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("ConsumedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("consumedat");
 
                     b.Property<int>("MealId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("mealid");
 
                     b.Property<int>("ProductId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("productid");
 
                     b.Property<double>("Quantity")
-                        .HasColumnType("double precision");
+                        .HasColumnType("double precision")
+                        .HasColumnName("quantity");
 
                     b.Property<double>("WeightGrams")
-                        .HasColumnType("double precision");
+                        .HasColumnType("double precision")
+                        .HasColumnName("weightgrams");
 
                     b.HasKey("Id");
 
@@ -178,17 +204,19 @@ namespace Persistence.Migrations
                 {
                     b.Property<int>("Id")
                         .HasColumnType("integer")
-                        .HasColumnName("FoodTypeId");
+                        .HasColumnName("id");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("imageurl");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
 
                     b.HasKey("Id");
 
@@ -200,16 +228,18 @@ namespace Persistence.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("MealId");
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("MealTime")
-                        .HasColumnType("timestamp");
+                        .HasColumnType("timestamp")
+                        .HasColumnName("mealtime");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("userid");
 
                     b.HasKey("Id");
 
@@ -220,32 +250,39 @@ namespace Persistence.Migrations
                 {
                     b.Property<int>("Id")
                         .HasColumnType("integer")
-                        .HasColumnName("ProductId");
+                        .HasColumnName("id");
 
                     b.Property<float>("CaloriesPer100")
-                        .HasColumnType("real");
+                        .HasColumnType("real")
+                        .HasColumnName("caloriesper100");
 
                     b.Property<float>("CarbsPer100")
-                        .HasColumnType("real");
+                        .HasColumnType("real")
+                        .HasColumnName("carbsper100");
 
                     b.Property<float>("FatsPer100")
-                        .HasColumnType("real");
+                        .HasColumnType("real")
+                        .HasColumnName("fatsper100");
 
                     b.Property<int>("FoodTypeId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("foodtypeid");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("imageurl");
 
                     b.Property<float>("ProteinPer100")
-                        .HasColumnType("real");
+                        .HasColumnType("real")
+                        .HasColumnName("proteinper100");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("title");
 
                     b.HasKey("Id");
 
@@ -259,20 +296,22 @@ namespace Persistence.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("TrainingId");
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Trained")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("trained");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("userid");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Trainings");
+                    b.ToTable("trainings", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Exercise", b =>
@@ -290,13 +329,13 @@ namespace Persistence.Migrations
                 {
                     b.HasOne("Domain.Exercise", "Exercise")
                         .WithMany("ExerciseSets")
-                        .HasForeignKey("Exercise_Id")
+                        .HasForeignKey("ExerciseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Training", "Training")
                         .WithMany("ExerciseSets")
-                        .HasForeignKey("Training_Id")
+                        .HasForeignKey("TrainingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

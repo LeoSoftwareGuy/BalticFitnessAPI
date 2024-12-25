@@ -8,17 +8,21 @@ namespace Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Training> builder)
         {
+            builder.ToTable("trainings");
             builder.HasKey(e => e.Id);
 
             builder.Property(e => e.Id)
-             .HasColumnName("TrainingId")
+             .HasColumnName("trainingId")
             .ValueGeneratedOnAdd();
       
             builder.Property(e => e.Trained)
+             .HasColumnName("trained")
              .HasColumnType("timestamp with time zone")
              .IsRequired();
 
-            builder.Property(e => e.UserId).IsRequired();
+            builder.Property(e => e.UserId)
+                .HasColumnName("userId")
+                .IsRequired();
         }
     }
 }

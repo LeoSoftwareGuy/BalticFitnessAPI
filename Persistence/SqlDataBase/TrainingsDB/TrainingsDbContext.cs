@@ -23,6 +23,13 @@ namespace Persistence.SqlDataBase.TrainingsDB
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(TrainingsDbContext).Assembly);
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entity.GetProperties())
+                {
+                    property.SetColumnName(property.Name.ToLower());
+                }
+            }
         }
     }
 }
