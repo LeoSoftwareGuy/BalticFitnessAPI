@@ -1,55 +1,52 @@
-﻿using Application.Data;
+﻿
+using Application.Data;
 using Application.Support.Interfaces;
 using Application.Trainings.DTOs.Nutrition;
 using AutoMapper;
+using BuildingBlocks.CQRS;
 using Domain.Nutrition;
 using MediatR;
 
 
 namespace Application.Trainings.Commands.SaveMealCommand
 {
-    public class SaveMealCommand : IRequest<Unit>
+    public record SaveMealCommand(List<ConsumedProductDto> ProductDtos) : ICommand<SaveMealResult>;
+    public record SaveMealResult(int Id);
+
+    public class SaveMealCommandHandler : ICommandHandler<SaveMealCommand, SaveMealResult>
     {
-        public DateTime MealTime { get; set; }
+        private readonly IMapper _mapper;
+        private readonly ITrainingDbContext _dbContext;
+        private readonly IMediator _mediator;
+        private readonly ICurrentUserService _currentUserService;
 
-        public List<ConsumedProductDto> Products { get; set; } 
-
-        public class SaveMealCommandHandler : IRequestHandler<SaveMealCommand, Unit>
+        public SaveMealCommandHandler(IMapper mapper, ITrainingDbContext dbContext, IMediator mediator, ICurrentUserService currentUserService)
         {
-            private readonly IMapper _mapper;
-            private readonly ITrainingDbContext _dbContext;
-            private readonly IMediator _mediator;
-            private readonly ICurrentUserService _currentUserService;
+            _mapper = mapper;
+            _dbContext = dbContext;
+            _mediator = mediator;
+            _currentUserService = currentUserService;
+        }
+        public async Task<SaveMealResult> Handle(SaveMealCommand request, CancellationToken cancellationToken)
+        {
+            var userId = _currentUserService.UserId;
 
-            public SaveMealCommandHandler(IMapper mapper, ITrainingDbContext dbContext, IMediator mediator, ICurrentUserService currentUserService)
+            if (userId == null)
             {
-                _mapper = mapper;
-                _dbContext = dbContext;
-                _mediator = mediator;
-                _currentUserService = currentUserService;
+                throw new UnauthorizedAccessException("User is not authenticated.");
             }
-            public async Task<Unit> Handle(SaveMealCommand request, CancellationToken cancellationToken)
+            var consumedProducts = _mapper.Map<List<ConsumedProduct>>(request.ProductDtos);
+
+            var entity = new Meal
             {
-                var userId = _currentUserService.UserId;
+                UserId = userId,
+                ConsumedProducts = consumedProducts
+            };
 
-                if (userId == null)
-                {
-                    throw new UnauthorizedAccessException("User is not authenticated.");
-                }
-                var consumedProducts = _mapper.Map<List<ConsumedProduct>>(request.Products);
+            await _dbContext.Meals.AddAsync(entity, cancellationToken: cancellationToken);
+            await _mediator.Publish(new MealAdded { UserId = entity.UserId }, cancellationToken);
 
-                var entity = new Meal
-                {
-                    UserId = userId,
-                    MealTime = DateTime.UtcNow,
-                    ConsumedProducts = consumedProducts
-                };
-
-                await _dbContext.Meals.AddAsync(entity, cancellationToken: cancellationToken);
-                await _mediator.Publish(new MealAdded { UserId = entity.UserId }, cancellationToken);
-
-                return Unit.Value;
-            }
+            return new SaveMealResult(entity.Id);
         }
     }
 }

@@ -1,13 +1,16 @@
 ﻿using Application.Data;
 using Application.Support.Exceptions;
 using AutoMapper;
+using BuildingBlocks.CQRS;
 using Domain;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.MuscleGroups.Queries.GetExercises
 {
-    public class GetExcercisesQueryHandler : IRequestHandler<GetExcercisesQuery, List<ExerciseDto>>
+    public record GetExcercisesForMuscleGroupQuery(int MuscleGroupId) : IQuery<GetExercisesResult>;
+    public record GetExercisesResult(List<ExerciseDto> ExerciseDtos);
+
+    public class GetExcercisesQueryHandler : IQueryHandler<GetExcercisesForMuscleGroupQuery, GetExercisesResult>
     {
         private ITrainingDbContext _context;
         private IMapper _mapper;
@@ -18,13 +21,13 @@ namespace Application.MuscleGroups.Queries.GetExercises
             _mapper = mapper;
         }
 
-        public async Task<List<ExerciseDto>> Handle(GetExcercisesQuery request, CancellationToken cancellationToken)
+        public async Task<GetExercisesResult> Handle(GetExcercisesForMuscleGroupQuery request, CancellationToken cancellationToken)
         {
             var muscleGroup = await _context.MuscleGroups
                             .Include(c => c.Exercises)
                             .AsNoTracking()
                             .FirstOrDefaultAsync(c => c.Id.Equals(request.MuscleGroupId), cancellationToken);
- 
+
 
             if (muscleGroup == null)
             {
@@ -32,7 +35,7 @@ namespace Application.MuscleGroups.Queries.GetExercises
             }
 
             var exerciseDtos = _mapper.Map<List<ExerciseDto>>(muscleGroup.Exercises);
-            return exerciseDtos;
+            return new GetExercisesResult(exerciseDtos);
         }
     }
 }

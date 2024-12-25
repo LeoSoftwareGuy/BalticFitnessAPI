@@ -1,14 +1,17 @@
 ﻿using Application.Data;
 using Application.Support.Interfaces;
 using AutoMapper;
+using BuildingBlocks.CQRS;
 using Domain.Nutrition;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 
 namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
 {
-    public class GetMonthlyStatsQueryHandler : IRequestHandler<GetMonthlyStatsQuery, StatResults>
+    public record GetMonthlyStatsQuery : IQuery<GetMonthlyStatsResult>;
+    public record GetMonthlyStatsResult(StatResults StatResults);
+
+    public class GetMonthlyStatsQueryHandler : IQueryHandler<GetMonthlyStatsQuery, GetMonthlyStatsResult>
     {
         private readonly IMapper _mapper;
         private readonly ITrainingDbContext _context;
@@ -20,7 +23,7 @@ namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
             _currentUserService = currentUserService;
         }
 
-        public async Task<StatResults> Handle(GetMonthlyStatsQuery request, CancellationToken cancellationToken)
+        public async Task<GetMonthlyStatsResult> Handle(GetMonthlyStatsQuery request, CancellationToken cancellationToken)
         {
             var userId = _currentUserService.UserId;
 
@@ -49,7 +52,7 @@ namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
             //    stats.AverageAmountOfCarbsPerDay = mealsPerMonth.Count.Equals(0) ? 0 : RoundUpForDouble(GetAverageAmountOfCarbsPerDay(mealsPerMonth), 2);
             //}
 
-            return stats;
+            return new GetMonthlyStatsResult(stats);
         }
 
 

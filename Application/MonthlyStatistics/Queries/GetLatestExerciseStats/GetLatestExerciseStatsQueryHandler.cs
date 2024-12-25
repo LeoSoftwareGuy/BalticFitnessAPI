@@ -1,13 +1,16 @@
 ﻿using Application.Data;
 using Application.Support.Interfaces;
 using AutoMapper;
+using BuildingBlocks.CQRS;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 
 namespace Application.MonthlyStatistics.Queries.GetLatestExerciseStats
 {
-    public class GetLatestExerciseStatsQueryHandler : IRequestHandler<GetLatestExerciseStatsQuery, ExerciseStats>
+    public record GetLatestExerciseStatsQuery(int ExerciseId) : IQuery<GetLatestExerciseStatsResult>;
+    public record GetLatestExerciseStatsResult(ExerciseStats ExerciseStats);
+    public class GetLatestExerciseStatsQueryHandler : IRequestHandler<GetLatestExerciseStatsQuery, GetLatestExerciseStatsResult>
     {
         private readonly IMapper _mapper;
         private readonly ITrainingDbContext _context;
@@ -20,7 +23,7 @@ namespace Application.MonthlyStatistics.Queries.GetLatestExerciseStats
             _currentUserService = currentUserService;
         }
 
-        public async Task<ExerciseStats> Handle(GetLatestExerciseStatsQuery request, CancellationToken cancellationToken)
+        public async Task<GetLatestExerciseStatsResult> Handle(GetLatestExerciseStatsQuery request, CancellationToken cancellationToken)
         {
             var userId = _currentUserService.UserId;
 
@@ -51,14 +54,14 @@ namespace Application.MonthlyStatistics.Queries.GetLatestExerciseStats
                 throw new InvalidOperationException("No data found for the given exercise.");
             }
 
-            return new ExerciseStats
+            return new GetLatestExerciseStatsResult(new ExerciseStats
             {
                 ExerciseName = latestExercuseStats.Exercise.Name,
                 TrainingId = latestExercuseStats.Training.Id,
                 Weight = latestExercuseStats.Weight.ToString(),
                 Sets = latestExercuseStats.Training.ExerciseSets.Count(c => c.ExerciseId.Equals(request.ExerciseId)),
                 Reps = latestExercuseStats.Reps
-            };
+            });
 
         }
     }

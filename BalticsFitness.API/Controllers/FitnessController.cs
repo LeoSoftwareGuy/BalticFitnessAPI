@@ -13,7 +13,7 @@ namespace BalticsFitness.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<SortedByDayTraining>>> GetTrainings()
         {
-            return Ok(await Mediator.Send(new GetTrainingsRequest ()));
+            return Ok(await Mediator.Send(new GetTrainingsSortedByDay()));
         }
 
         [HttpGet("allMeals")]

@@ -18,7 +18,7 @@ namespace BalticsFitness.API.Controllers
         [HttpGet("filterBy")]
         public async Task<ActionResult<SummaryInfoBasedOnFilter>> GetStats(string filterBy)
         {
-            return Ok(await Mediator.Send(new GetSummaryInfoBasedOnFilterQuery() { Filter = filterBy }));
+            return Ok(await Mediator.Send(new GetSummaryInfoBasedOnFilterQuery(filterBy)));
         }
 
         [HttpGet("exercise/{exerciseId}/{type}")]
@@ -27,12 +27,12 @@ namespace BalticsFitness.API.Controllers
             if (type == "Best")
             {
                 // Handle "Best" type
-                return Ok(await Mediator.Send(new GetBestExerciseStatsQuery() { ExerciseId = exerciseId }));
+                return Ok(await Mediator.Send(new GetBestExerciseStatsQuery(exerciseId)));
             }
             else
             {
                 // Handle "Last" type
-                return Ok(await Mediator.Send(new GetLatestExerciseStatsQuery() { ExerciseId = exerciseId }));
+                return Ok(await Mediator.Send(new GetLatestExerciseStatsQuery(exerciseId)));
             }
         }
     }

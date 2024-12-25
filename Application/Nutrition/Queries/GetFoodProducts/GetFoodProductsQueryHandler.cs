@@ -1,12 +1,14 @@
 ﻿using Application.Data;
 using Application.Support.Exceptions;
 using AutoMapper;
-using MediatR;
+using BuildingBlocks.CQRS;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Nutrition.Queries.GetFoodProducts
 {
-    public class GetFoodProductsQueryHandler : IRequestHandler<GetFoodProductsQuery, List<ProductDto>>
+    public record GetFoodProductsQuery(string FoodTypeUrl) : IQuery<GetFoodProductsResult>;
+    public record GetFoodProductsResult(List<ProductDto> ProductDtos);
+    public class GetFoodProductsQueryHandler : IQueryHandler<GetFoodProductsQuery, GetFoodProductsResult>
     {
         private readonly IMapper _mapper;
         private readonly ITrainingDbContext _context;
@@ -17,7 +19,7 @@ namespace Application.Nutrition.Queries.GetFoodProducts
             _context = context;
         }
 
-        public async Task<List<ProductDto>> Handle(GetFoodProductsQuery request, CancellationToken cancellationToken)
+        public async Task<GetFoodProductsResult> Handle(GetFoodProductsQuery request, CancellationToken cancellationToken)
         {
             var foodType = await _context.FoodTypes
                .FirstOrDefaultAsync(c => c.Name.Equals(request.FoodTypeUrl, StringComparison.OrdinalIgnoreCase),cancellationToken);
@@ -36,7 +38,7 @@ namespace Application.Nutrition.Queries.GetFoodProducts
             }
 
             var productDtos = _mapper.Map<List<ProductDto>>(products);
-            return productDtos;
+            return new GetFoodProductsResult(productDtos);
         }
     }
 }

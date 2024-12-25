@@ -1,11 +1,13 @@
 ﻿using Application.Data;
 using AutoMapper;
-using MediatR;
+using BuildingBlocks.CQRS;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Nutrition.Queries.GetFoodTypes
 {
-    public class GetFoodTypesQueryHandler : IRequestHandler<GetFoodTypesQuery, List<FoodTypeDto>>
+    public record GetFoodTypesQuery : IQuery<GetFoodTypesResult>;
+    public record GetFoodTypesResult(List<FoodTypeDto> FoodTypeDtos);
+    public class GetFoodTypesQueryHandler : IQueryHandler<GetFoodTypesQuery, GetFoodTypesResult>
     {
         private readonly IMapper _mapper;
         private readonly ITrainingDbContext _context;
@@ -15,12 +17,13 @@ namespace Application.Nutrition.Queries.GetFoodTypes
             _mapper = mapper;
             _context = mongoDbContext;
         }
-        public async Task<List<FoodTypeDto>> Handle(GetFoodTypesQuery request, CancellationToken cancellationToken)
+        public async Task<GetFoodTypesResult> Handle(GetFoodTypesQuery request, CancellationToken cancellationToken)
         {
             var foodTypes = await _context.FoodTypes
                    .ToListAsync(cancellationToken);
 
-            return _mapper.Map<List<FoodTypeDto>>(foodTypes);
+            var foodTypesDto = _mapper.Map<List<FoodTypeDto>>(foodTypes);
+            return new GetFoodTypesResult(foodTypesDto);
         }
     }
 }

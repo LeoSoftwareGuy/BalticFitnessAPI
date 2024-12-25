@@ -3,13 +3,15 @@ using Application.Data;
 using Application.Support.Interfaces;
 using Application.Trainings.DTOs.Trainings;
 using AutoMapper;
-using MediatR;
+using BuildingBlocks.CQRS;
 using Microsoft.EntityFrameworkCore;
 
 
 namespace Application.Trainings.Queries.GetTrainings
 {
-    public class GetTrainingRequestHandler : IRequestHandler<GetTrainingsRequest, List<SortedByDayTraining>>
+    public record GetTrainingsSortedByDay() : IQuery<GetTrainingsSortedByDayResult>;
+    public record GetTrainingsSortedByDayResult(List<SortedByDayTraining> SortedByDayTrainingDtos);
+    public class GetTrainingRequestHandler : IQueryHandler<GetTrainingsSortedByDay, GetTrainingsSortedByDayResult>
     {
         private readonly ITrainingDbContext _context;
         private readonly ICurrentUserService _currentUserService;
@@ -30,7 +32,7 @@ namespace Application.Trainings.Queries.GetTrainings
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<List<SortedByDayTraining>> Handle(GetTrainingsRequest request, CancellationToken cancellationToken)
+        public async Task<GetTrainingsSortedByDayResult> Handle(GetTrainingsSortedByDay request, CancellationToken cancellationToken)
         {
             var userId = _currentUserService.UserId;
 
@@ -117,7 +119,7 @@ namespace Application.Trainings.Queries.GetTrainings
                 }
             }
 
-            return result;
+            return new GetTrainingsSortedByDayResult(result);
         }
     }
 }

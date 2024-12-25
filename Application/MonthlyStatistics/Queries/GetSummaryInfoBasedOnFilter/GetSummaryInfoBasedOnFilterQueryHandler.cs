@@ -1,14 +1,16 @@
 ﻿using Application.Data;
 using Application.Support.Interfaces;
 using AutoMapper;
+using BuildingBlocks.CQRS;
 using Domain;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 
 namespace Application.MonthlyStatistics.Queries.GetSummaryInfoBasedOnFilter
 {
-    public class GetSummaryInfoBasedOnFilterQueryHandler : IRequestHandler<GetSummaryInfoBasedOnFilterQuery, SummaryInfoBasedOnFilter>
+    public record GetSummaryInfoBasedOnFilterQuery(string Filter) : IQuery<GetSummaryInfoBasedOnFilterResult>;
+    public record GetSummaryInfoBasedOnFilterResult(SummaryInfoBasedOnFilter SummaryInfoBasedOnFilter);
+    public class GetSummaryInfoBasedOnFilterQueryHandler : IQueryHandler<GetSummaryInfoBasedOnFilterQuery, GetSummaryInfoBasedOnFilterResult>
     {
         private readonly IMapper _mapper;
         private readonly ITrainingDbContext _context;
@@ -20,7 +22,7 @@ namespace Application.MonthlyStatistics.Queries.GetSummaryInfoBasedOnFilter
             _currentUserService = currentUserService;
         }
 
-        public async Task<SummaryInfoBasedOnFilter> Handle(GetSummaryInfoBasedOnFilterQuery request, CancellationToken cancellationToken)
+        public async Task<GetSummaryInfoBasedOnFilterResult> Handle(GetSummaryInfoBasedOnFilterQuery request, CancellationToken cancellationToken)
         {
             var userId = _currentUserService.UserId;
 
@@ -54,7 +56,7 @@ namespace Application.MonthlyStatistics.Queries.GetSummaryInfoBasedOnFilter
                 summaryInfo.MuscleGroupsCount = muscleGroupsTrained;
             }
 
-            return summaryInfo;
+            return new GetSummaryInfoBasedOnFilterResult(summaryInfo);
         }
 
 

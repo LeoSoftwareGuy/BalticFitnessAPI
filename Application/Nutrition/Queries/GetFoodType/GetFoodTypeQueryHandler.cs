@@ -1,13 +1,15 @@
 ﻿using Application.Data;
 using Application.Support.Exceptions;
 using AutoMapper;
+using BuildingBlocks.CQRS;
 using Domain.Nutrition;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Nutrition.Queries.GetFoodType
 {
-    public class GetFoodTypeQueryHandler : IRequestHandler<GetFoodTypeQuery, FoodTypeDto>
+    public record GetFoodTypeQuery(int Id) : IQuery<GetFoodTypeResult>;
+    public record GetFoodTypeResult(FoodTypeDto FoodTypeDto);
+    public class GetFoodTypeQueryHandler : IQueryHandler<GetFoodTypeQuery, GetFoodTypeResult>
     {
         private IMapper _mapper;
         private ITrainingDbContext _dbContext;
@@ -17,7 +19,7 @@ namespace Application.Nutrition.Queries.GetFoodType
             _mapper = mapper;
             _dbContext = dbContext;
         }
-        public async Task<FoodTypeDto> Handle(GetFoodTypeQuery request, CancellationToken cancellationToken)
+        public async Task<GetFoodTypeResult> Handle(GetFoodTypeQuery request, CancellationToken cancellationToken)
         {
             var foodType = await _dbContext.FoodTypes
                     .FirstOrDefaultAsync(c => c.Id.Equals(request.Id));
@@ -27,7 +29,8 @@ namespace Application.Nutrition.Queries.GetFoodType
                 throw new FoodTypeNotFoundException(nameof(FoodType), request.Id);
             }
 
-            return _mapper.Map<FoodTypeDto>(foodType);
+            var foodTypeDto = _mapper.Map<FoodTypeDto>(foodType);
+            return new GetFoodTypeResult(foodTypeDto);
         }
     }
 }

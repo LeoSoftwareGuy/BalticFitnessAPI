@@ -2,6 +2,7 @@
 using Application.Support.Interfaces;
 using Application.Trainings.DTOs.Trainings;
 using AutoMapper;
+using BuildingBlocks.CQRS;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -9,70 +10,68 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Trainings.Commands.SaveTrainingCommand
 {
-    public class SaveTrainingCommand : IRequest<Unit>
+    public record SaveTrainingCommand(List<ExerciseSetDto> ExerciseSets) : ICommand<SaveTrainingResult>;
+
+    public record SaveTrainingResult(int Id);
+
+    public class SaveTrainingCommandHandler : ICommandHandler<SaveTrainingCommand, SaveTrainingResult>
     {
-        public List<ExerciseSetDto> ExerciseSets { get; set; }
+        private readonly IMapper _mapper;
+        private readonly ITrainingDbContext _context;
+        private readonly IMediator _mediator;
+        private readonly ICurrentUserService _currentUserService;
 
-        public class SaveTrainingCommandHandler : IRequestHandler<SaveTrainingCommand, Unit>
+        public SaveTrainingCommandHandler(ITrainingDbContext context, IMediator mediator, IMapper mapper, ICurrentUserService currentUserService)
         {
-            private readonly IMapper _mapper;
-            private readonly ITrainingDbContext _context;
-            private readonly IMediator _mediator;
-            private readonly ICurrentUserService _currentUserService;
+            _mapper = mapper;
+            _context = context;
+            _mediator = mediator;
+            _currentUserService = currentUserService;
+        }
 
-            public SaveTrainingCommandHandler(ITrainingDbContext context, IMediator mediator, IMapper mapper, ICurrentUserService currentUserService)
+        public async Task<SaveTrainingResult> Handle(SaveTrainingCommand request, CancellationToken cancellationToken)
+        {
+            var userId = _currentUserService.UserId;
+
+            if (userId == null)
             {
-                _mapper = mapper;
-                _context = context;
-                _mediator = mediator;
-                _currentUserService = currentUserService;
+                throw new UnauthorizedAccessException("User is not authenticated.");
             }
 
-            public async Task<Unit> Handle(SaveTrainingCommand request, CancellationToken cancellationToken)
+            var exerciseSets = _mapper.Map<List<ExerciseSet>>(request.ExerciseSets);
+
+            // Fetch all required exercises in one go
+            var exerciseIds = exerciseSets.Select(e => e.ExerciseId).Distinct();
+            var existingExercises = await _context.Exercises
+                .Where(e => exerciseIds.Contains(e.Id))
+                .ToDictionaryAsync(e => e.Id, cancellationToken);
+
+            // Attach exercises to ExerciseSets
+            foreach (var set in exerciseSets)
             {
-                var userId = _currentUserService.UserId;
-
-                if (userId == null)
+                if (existingExercises.TryGetValue(set.ExerciseId, out var exercise))
                 {
-                    throw new UnauthorizedAccessException("User is not authenticated.");
+                    set.Exercise = exercise;
                 }
-
-                // Map incoming DTOs to ExerciseSet entities
-                var exerciseSets = _mapper.Map<List<ExerciseSet>>(request.ExerciseSets);
-
-                // Fetch all required exercises in one go
-                var exerciseIds = exerciseSets.Select(e => e.ExerciseId).Distinct();
-                var existingExercises = await _context.Exercises
-                    .Where(e => exerciseIds.Contains(e.Id))
-                    .ToDictionaryAsync(e => e.Id, cancellationToken);
-
-                // Attach exercises to ExerciseSets
-                foreach (var set in exerciseSets)
+                else
                 {
-                    if (existingExercises.TryGetValue(set.ExerciseId, out var exercise))
-                    {
-                        set.Exercise = exercise;
-                    }
-                    else
-                    {
-                        throw new KeyNotFoundException($"Exercise with Id {set.ExerciseId} not found.");
-                    }
+                    throw new KeyNotFoundException($"Exercise with Id {set.ExerciseId} not found.");
                 }
-
-                // Create new Training entity
-                var entity = new Training
-                {
-                    UserId = userId,
-                    ExerciseSets = exerciseSets
-                };
-
-                await _context.Trainings.AddAsync(entity, cancellationToken);
-                await _context.SaveChangesAsync(cancellationToken);
-                // Notify other parts of the system
-                await _mediator.Publish(new TrainingAdded { UserId = entity.UserId }, cancellationToken);
-
-                return Unit.Value;
             }
+
+            // Create new Training entity
+            var entity = new Training
+            {
+                UserId = userId,
+                ExerciseSets = exerciseSets
+            };
+
+            await _context.Trainings.AddAsync(entity, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            // Notify other parts of the system
+            await _mediator.Publish(new TrainingAdded { UserId = entity.UserId }, cancellationToken);
+
+            return new SaveTrainingResult(entity.Id);
         }
     }
 }

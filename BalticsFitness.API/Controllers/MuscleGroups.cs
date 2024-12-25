@@ -1,6 +1,5 @@
 ﻿using Application.MuscleGroups.Queries;
 using Application.MuscleGroups.Queries.GetExercises;
-using Application.MuscleGroups.Queries.GetMuscleGroup;
 using Application.MuscleGroups.Queries.GetMuscleGroups;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +20,7 @@ namespace BalticsFitness.API.Controllers
         [HttpGet()]
         [AllowAnonymous]
         public async Task<ActionResult<List<MuscleGroupDto>>> GetMuscleGroupsWithExercises()
-        {      
+        {
             return Ok(await Mediator.Send(new GetMuscleGroupsWithExercisesQuery()));
         }
 
@@ -29,14 +28,14 @@ namespace BalticsFitness.API.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<MuscleGroupDto>> GetMuscleGroup(int id)
         {
-            return Ok(await Mediator.Send(new GetMuscleGroupQuery { Id = id }));
+            return Ok(await Mediator.Send(new GetExcercisesForMuscleGroupQuery(id)));
         }
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<ExerciseDto>>> GetExercisesForMuscleGroup(int id)
+        public async Task<ActionResult<GetExercisesResult>> GetExercisesForMuscleGroup(int id)
         {
-            return Ok(await Mediator.Send(new GetExcercisesQuery { MuscleGroupId = id }));
+            return Ok(await Mediator.Send(new GetExcercisesForMuscleGroupQuery(id)));
         }
     }
 }

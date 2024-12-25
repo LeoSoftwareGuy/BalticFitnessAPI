@@ -2,13 +2,15 @@
 using Application.Support.Interfaces;
 using Application.Trainings.DTOs.Nutrition;
 using AutoMapper;
+using BuildingBlocks.CQRS;
 using Domain.Nutrition;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Trainings.Queries.GetMeals
 {
-    public class GetMealsRequestHandler : IRequestHandler<GetMealsRequest, List<SortedByDayNutrients>>
+    public record GetMealsRequest : IQuery<GetMealsResult>;
+    public record GetMealsResult(List<SortedByDayNutrients> SortedByDayNutrientsDtos);
+    public class GetMealsRequestHandler : IQueryHandler<GetMealsRequest, GetMealsResult>
     {
         private readonly IMapper _mapper;
         private readonly ITrainingDbContext _context;
@@ -21,7 +23,7 @@ namespace Application.Trainings.Queries.GetMeals
             _currentUserService = currentUserService;
         }
 
-        public async Task<List<SortedByDayNutrients>> Handle(GetMealsRequest request, CancellationToken cancellationToken)
+        public async Task<GetMealsResult> Handle(GetMealsRequest request, CancellationToken cancellationToken)
         {
             var userId = _currentUserService.UserId;
 
@@ -65,7 +67,7 @@ namespace Application.Trainings.Queries.GetMeals
                 }
             }
 
-            return result;
+            return new GetMealsResult(result);
         }
         private double RoundUpForDouble(double input, int places)
         {
