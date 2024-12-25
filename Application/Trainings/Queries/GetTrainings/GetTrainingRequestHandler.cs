@@ -45,13 +45,14 @@ namespace Application.Trainings.Queries.GetTrainings
                  .Where(t => t.UserId == userId)
                  .Include(t => t.ExerciseSets)
                  .ThenInclude(e => e.Exercise)
+                 .ThenInclude(e => e.MuscleGroup)
                  .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
             if (trainings.Any())
             {
-                var muscleGroups = (await _context.MuscleGroups
-                    .ToListAsync(cancellationToken));
+                var muscleGroups = await _context.MuscleGroups
+                    .ToListAsync(cancellationToken);
 
                 var sortedByDayTrainings = trainings
                        .OrderByDescending(d => d.Trained)
@@ -60,20 +61,50 @@ namespace Application.Trainings.Queries.GetTrainings
 
                 foreach (var dayGroup in sortedByDayTrainings)
                 {
-                    var exerciseSetsPerDay = dayGroup.SelectMany(t => t.ExerciseSets).ToList();
+                    var allExerciseSetsDoneDuringThisDay = dayGroup.SelectMany(t => t.ExerciseSets).ToList();
+                    var unqiueMuscleGroupsTrainedDuringThisDay = allExerciseSetsDoneDuringThisDay
+                        .Select(e => e.Exercise.MuscleGroup.Name)
+                        .Distinct()
+                        .ToList();
 
-                    // Group exercise sets by muscle group
-                    var exercisesPerMuscleGroup = exerciseSetsPerDay
-                        .GroupBy(es => es.Exercise.MuscleGroupId) // Group by MuscleGroupId
-                        .ToDictionary(
-                            g => muscleGroups.FirstOrDefault(m => m.Id == g.Key)?.Name!, // Get muscle group name
-                            g => g.Select(es => new ExerciseGroupDto
+                    var exercisesPerMuscleGroupSimplified = new Dictionary<string, List<ExerciseGroupDto>>();
+
+                    foreach (var uniqueMuscleGroupTrainedThisDay in unqiueMuscleGroupsTrainedDuringThisDay)
+                    {
+                        var allExerciseSetsForThisMuscleGroup = allExerciseSetsDoneDuringThisDay.
+                            Where(t => t.Exercise.MuscleGroup.Name == uniqueMuscleGroupTrainedThisDay).ToList();
+
+                        var uniqueExercisesIdsPerMuscleGroup = allExerciseSetsDoneDuringThisDay.
+                           Where(t => t.Exercise.MuscleGroup.Name == uniqueMuscleGroupTrainedThisDay)
+                           .Select(c => c.ExerciseId)
+                           .Distinct()
+                           .ToList();
+
+                        var allExercisesAndTheirSetsForMuscleGroup = new List<ExerciseGroupDto>();
+                        foreach (var uniqueExerciseIdForParticluarMuscleGroup in uniqueExercisesIdsPerMuscleGroup)
+                        {
+                            var allExerciseSetsForAnExercise = allExerciseSetsForThisMuscleGroup
+                                .Where(c => c.ExerciseId == uniqueExerciseIdForParticluarMuscleGroup)
+                                .Select(c => new ExerciseSetDto()
+                                {
+                                    ExerciseId = c.ExerciseId,
+                                    Reps = c.Reps,
+                                    Weight = c.Weight
+                                })
+                                .ToList();
+
+                            var exerciseGroup = new ExerciseGroupDto
                             {
-                                Id = es.Exercise.Id,
-                                Name = es.Exercise.Name,
-                                ExerciseSets = _mapper.Map<List<ExerciseSetDto>>(g.ToList())
-                            }).ToList()
-                        );
+                                Name = allExerciseSetsForThisMuscleGroup.First().Exercise.Name,
+                                Id = uniqueExerciseIdForParticluarMuscleGroup,
+                                ExerciseSets = allExerciseSetsForAnExercise
+                            };
+
+                            allExercisesAndTheirSetsForMuscleGroup.Add(exerciseGroup);
+                        }
+
+                        exercisesPerMuscleGroupSimplified.Add(uniqueMuscleGroupTrainedThisDay, allExercisesAndTheirSetsForMuscleGroup);
+                    }
 
                     result.Add(new SortedByDayTraining
                     {
@@ -81,7 +112,7 @@ namespace Application.Trainings.Queries.GetTrainings
                         TrainedAtMonth = dayGroup.Key.Month,
                         TrainedAtYear = dayGroup.Key.Year,
                         TrainedAtTime = dayGroup.Key.TimeOfDay.ToString(@"hh\:mm"),
-                        ExercisesPerMuscleGroup = exercisesPerMuscleGroup
+                        ExercisesPerMuscleGroup = exercisesPerMuscleGroupSimplified
                     });
                 }
             }

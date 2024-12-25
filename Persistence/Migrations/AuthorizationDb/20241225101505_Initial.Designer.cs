@@ -9,10 +9,10 @@ using Persistence.SqlDataBase.AuthorizationDB;
 
 #nullable disable
 
-namespace Persistence.Migrations
+namespace Persistence.Migrations.AuthorizationDb
 {
     [DbContext(typeof(AuthorizationDbContext))]
-    [Migration("20241225095535_Initial")]
+    [Migration("20241225101505_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -69,7 +69,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("appUsers", (string)null);
+                    b.ToTable("appusers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Authentication.RefreshTokens", b =>
@@ -98,7 +98,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("AppUserId");
 
-                    b.ToTable("AppUserTokens");
+                    b.ToTable("appusertokens");
                 });
 
             modelBuilder.Entity("Domain.Authentication.RefreshTokens", b =>

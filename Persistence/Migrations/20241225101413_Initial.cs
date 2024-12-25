@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Persistence.Migrations.TrainingsDb
+namespace Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -13,7 +13,7 @@ namespace Persistence.Migrations.TrainingsDb
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "FoodTypes",
+                name: "foodtypes",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false),
@@ -22,11 +22,11 @@ namespace Persistence.Migrations.TrainingsDb
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FoodTypes", x => x.id);
+                    table.PrimaryKey("PK_foodtypes", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Meals",
+                name: "meals",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -36,7 +36,7 @@ namespace Persistence.Migrations.TrainingsDb
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Meals", x => x.id);
+                    table.PrimaryKey("PK_meals", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -68,7 +68,7 @@ namespace Persistence.Migrations.TrainingsDb
                 });
 
             migrationBuilder.CreateTable(
-                name: "Products",
+                name: "products",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false),
@@ -82,11 +82,11 @@ namespace Persistence.Migrations.TrainingsDb
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Products", x => x.id);
+                    table.PrimaryKey("PK_products", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Products_FoodTypes_foodtypeid",
+                        name: "FK_products_foodtypes_foodtypeid",
                         column: x => x.foodtypeid,
-                        principalTable: "FoodTypes",
+                        principalTable: "foodtypes",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -111,7 +111,7 @@ namespace Persistence.Migrations.TrainingsDb
                 });
 
             migrationBuilder.CreateTable(
-                name: "ConsumedProducts",
+                name: "consumedproducts",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -124,23 +124,23 @@ namespace Persistence.Migrations.TrainingsDb
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ConsumedProducts", x => x.id);
+                    table.PrimaryKey("PK_consumedproducts", x => x.id);
                     table.ForeignKey(
-                        name: "FK_ConsumedProducts_Meals_mealid",
+                        name: "FK_consumedproducts_meals_mealid",
                         column: x => x.mealid,
-                        principalTable: "Meals",
+                        principalTable: "meals",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ConsumedProducts_Products_productid",
+                        name: "FK_consumedproducts_products_productid",
                         column: x => x.productid,
-                        principalTable: "Products",
+                        principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "exerciseSets",
+                name: "exercisesets",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -152,15 +152,15 @@ namespace Persistence.Migrations.TrainingsDb
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_exerciseSets", x => x.id);
+                    table.PrimaryKey("PK_exercisesets", x => x.id);
                     table.ForeignKey(
-                        name: "FK_exerciseSets_exercises_exerciseid",
+                        name: "FK_exercisesets_exercises_exerciseid",
                         column: x => x.exerciseid,
                         principalTable: "exercises",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_exerciseSets_trainings_trainingid",
+                        name: "FK_exercisesets_trainings_trainingid",
                         column: x => x.trainingid,
                         principalTable: "trainings",
                         principalColumn: "id",
@@ -168,13 +168,13 @@ namespace Persistence.Migrations.TrainingsDb
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConsumedProducts_mealid",
-                table: "ConsumedProducts",
+                name: "IX_consumedproducts_mealid",
+                table: "consumedproducts",
                 column: "mealid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConsumedProducts_productid",
-                table: "ConsumedProducts",
+                name: "IX_consumedproducts_productid",
+                table: "consumedproducts",
                 column: "productid");
 
             migrationBuilder.CreateIndex(
@@ -183,36 +183,35 @@ namespace Persistence.Migrations.TrainingsDb
                 column: "musclegroupid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_exerciseSets_exerciseid",
-                table: "exerciseSets",
+                name: "IX_exercisesets_exerciseid",
+                table: "exercisesets",
                 column: "exerciseid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_exerciseSets_trainingid",
-                table: "exerciseSets",
+                name: "IX_exercisesets_trainingid",
+                table: "exercisesets",
                 column: "trainingid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_foodtypeid",
-                table: "Products",
+                name: "IX_products_foodtypeid",
+                table: "products",
                 column: "foodtypeid");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "consumedproducts");
 
             migrationBuilder.DropTable(
-                name: "ConsumedProducts");
+                name: "exercisesets");
 
             migrationBuilder.DropTable(
-                name: "exerciseSets");
+                name: "meals");
 
             migrationBuilder.DropTable(
-                name: "Meals");
-
-            migrationBuilder.DropTable(
-                name: "Products");
+                name: "products");
 
             migrationBuilder.DropTable(
                 name: "exercises");
@@ -221,7 +220,7 @@ namespace Persistence.Migrations.TrainingsDb
                 name: "trainings");
 
             migrationBuilder.DropTable(
-                name: "FoodTypes");
+                name: "foodtypes");
 
             migrationBuilder.DropTable(
                 name: "muscles");

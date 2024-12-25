@@ -19,6 +19,9 @@ namespace Persistence.SqlDataBase.AuthorizationDB
             modelBuilder.ApplyConfiguration(new AppUserConfig());
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
+                entity.SetTableName(entity.GetTableName().ToLower());
+
+                // Lowercase column names
                 foreach (var property in entity.GetProperties())
                 {
                     property.SetColumnName(property.Name.ToLower());

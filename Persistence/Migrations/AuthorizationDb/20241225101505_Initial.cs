@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Persistence.Migrations
+namespace Persistence.Migrations.AuthorizationDb
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -13,7 +13,7 @@ namespace Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "appUsers",
+                name: "appusers",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -27,11 +27,11 @@ namespace Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_appUsers", x => x.id);
+                    table.PrimaryKey("PK_appusers", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AppUserTokens",
+                name: "appusertokens",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -42,18 +42,18 @@ namespace Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AppUserTokens", x => x.id);
+                    table.PrimaryKey("PK_appusertokens", x => x.id);
                     table.ForeignKey(
-                        name: "FK_AppUserTokens_appUsers_appuserid",
+                        name: "FK_appusertokens_appusers_appuserid",
                         column: x => x.appuserid,
-                        principalTable: "appUsers",
+                        principalTable: "appusers",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AppUserTokens_appuserid",
-                table: "AppUserTokens",
+                name: "IX_appusertokens_appuserid",
+                table: "appusertokens",
                 column: "appuserid");
         }
 
@@ -61,10 +61,10 @@ namespace Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AppUserTokens");
+                name: "appusertokens");
 
             migrationBuilder.DropTable(
-                name: "appUsers");
+                name: "appusers");
         }
     }
 }

@@ -2,21 +2,18 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Persistence.SqlDataBase.TrainingsDB;
 
 #nullable disable
 
-namespace Persistence.Migrations.TrainingsDb
+namespace Persistence.Migrations
 {
     [DbContext(typeof(TrainingsDbContext))]
-    [Migration("20241225095612_Initial")]
-    partial class Initial
+    partial class TrainingsDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,7 +66,7 @@ namespace Persistence.Migrations.TrainingsDb
 
                     b.HasKey("Id");
 
-                    b.ToTable("appUsers", (string)null);
+                    b.ToTable("appusers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Exercise", b =>
@@ -131,7 +128,7 @@ namespace Persistence.Migrations.TrainingsDb
 
                     b.HasIndex("TrainingId");
 
-                    b.ToTable("exerciseSets", (string)null);
+                    b.ToTable("exercisesets", (string)null);
                 });
 
             modelBuilder.Entity("Domain.MuscleGroup", b =>
@@ -197,7 +194,7 @@ namespace Persistence.Migrations.TrainingsDb
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ConsumedProducts");
+                    b.ToTable("consumedproducts");
                 });
 
             modelBuilder.Entity("Domain.Nutrition.FoodType", b =>
@@ -220,7 +217,7 @@ namespace Persistence.Migrations.TrainingsDb
 
                     b.HasKey("Id");
 
-                    b.ToTable("FoodTypes");
+                    b.ToTable("foodtypes");
                 });
 
             modelBuilder.Entity("Domain.Nutrition.Meal", b =>
@@ -243,7 +240,7 @@ namespace Persistence.Migrations.TrainingsDb
 
                     b.HasKey("Id");
 
-                    b.ToTable("Meals");
+                    b.ToTable("meals");
                 });
 
             modelBuilder.Entity("Domain.Nutrition.Product", b =>
@@ -288,7 +285,7 @@ namespace Persistence.Migrations.TrainingsDb
 
                     b.HasIndex("FoodTypeId");
 
-                    b.ToTable("Products");
+                    b.ToTable("products");
                 });
 
             modelBuilder.Entity("Domain.Training", b =>

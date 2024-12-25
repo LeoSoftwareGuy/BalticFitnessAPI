@@ -12,7 +12,7 @@ namespace Application.Trainings.DTOs.Trainings
     {
         public int ExerciseId { get; set; } 
         public int Reps { get; set; }
-        public double Weight { get; set; }
+        public string Weight { get; set; }
 
         public void Mapping(Profile profile)
         {
