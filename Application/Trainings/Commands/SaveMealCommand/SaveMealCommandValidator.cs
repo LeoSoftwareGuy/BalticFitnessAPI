@@ -7,10 +7,8 @@ namespace Application.Trainings.Commands.SaveMealCommand
     {
         public SaveMealCommandValidator()
         {
-            RuleFor(x => x.Products).NotNull().NotEmpty().WithMessage("There are no products provided.");
-            RuleFor(x => x.MealTime).NotNull().WithMessage("No information was provided for meal time");
-
-            RuleForEach(x => x.Products).SetValidator(new ConsumedProductDtoValidator());
+            RuleFor(x => x.ProductDtos).NotNull().NotEmpty().WithMessage("There are no products provided.");
+            RuleForEach(x => x.ProductDtos).SetValidator(new ConsumedProductDtoValidator());
         }
 
 

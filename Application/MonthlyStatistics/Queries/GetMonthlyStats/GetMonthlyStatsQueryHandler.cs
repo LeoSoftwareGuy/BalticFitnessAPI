@@ -2,7 +2,6 @@
 using Application.Support.Interfaces;
 using AutoMapper;
 using BuildingBlocks.CQRS;
-using Domain.Nutrition;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -34,12 +33,12 @@ namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
 
             var stats = new StatResults();
 
-            //var bestWorkingWeightPerExercise = await GetBestWeightResultsPerExercise(userId);
-            //stats.BestWorkingWeightPerExercise = bestWorkingWeightPerExercise;
-            //stats.AverageAmountOfRepsPerTraining = trainingsPerMonth.Count.Equals(0)
-            //    ? 0
-            //        : RoundUp(GetAverageAmountOfRepsPerTraining(trainingsPerMonth), 2);
-            //    stats.AverageAmountOfSetsPerTraining = trainingsPerMonth.Count.Equals(0) ? 0 : RoundUp(GetAverageAmountOfSetsPerTraining(trainingsPerMonth), 2);
+            var bestWorkingWeightPerExercise = await GetBestWeightResultsPerExercise(userId);
+            var (averageAmountOfRepsPerTraining, averageAmountOfSetsPerTraining) = await GetTrainingAverages(userId);
+
+            stats.BestWorkingWeightPerExercise = bestWorkingWeightPerExercise;
+            stats.AverageAmountOfRepsPerTraining = averageAmountOfRepsPerTraining;
+            stats.AverageAmountOfSetsPerTraining = averageAmountOfSetsPerTraining;
 
 
             //var mealsPerMonth = await GetLast30DaysMeals(userId);
@@ -58,14 +57,14 @@ namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
 
         private async Task<Dictionary<string, string>> GetBestWeightResultsPerExercise(string userId)
         {
-           // SELECT e.Name AS ExerciseName, MAX(es.Weight) AS BestWeight
-           // FROM ExerciseSets es
-           // INNER JOIN Training t ON es.TrainingId = t.Id
-           // INNER JOIN Exercise e ON e.Id = es.ExerciseId
-           // WHERE t.UserId = @UserId
-           //   AND t.Trained >= DATEADD(MONTH, -1, GETUTCDATE())-- Last month from current UTC time
-           // GROUP BY e.Name
-           //ORDER BY t.Trained DESC; --Ordering by the most recent training
+            // SELECT e.Name AS ExerciseName, MAX(es.Weight) AS BestWeight
+            // FROM ExerciseSets es
+            // INNER JOIN Training t ON es.TrainingId = t.Id
+            // INNER JOIN Exercise e ON e.Id = es.ExerciseId
+            // WHERE t.UserId = @UserId
+            //   AND t.Trained >= DATEADD(MONTH, -1, GETUTCDATE())-- Last month from current UTC time
+            // GROUP BY e.Name
+            //ORDER BY t.Trained DESC; --Ordering by the most recent training
 
             var bestWeightPerExercise = await _context.ExerciseSets
                               .AsNoTracking()
@@ -73,15 +72,15 @@ namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
                               .Include(c => c.Exercise)
                               .Where(c => c.Training.UserId.Equals(userId) &&
                                       c.Training.Trained >= DateTime.UtcNow.AddMonths(-1))
-                             .OrderByDescending(c => c.Training.Trained) 
+                             .OrderByDescending(c => c.Training.Trained)
                              .GroupBy(c => c.Exercise.Name)
                              .Select(g => new
                              {
-                                   ExerciseName = g.Key,
-                                   BestWeight = g.Max(d => d.Weight)
+                                 ExerciseName = g.Key,
+                                 BestWeight = g.Max(d => d.Weight)
                              })
-                             .ToDictionaryAsync(g => g.ExerciseName, g => g.BestWeight);  
-      
+                             .ToDictionaryAsync(g => g.ExerciseName, g => g.BestWeight);
+
             if (bestWeightPerExercise == null)
             {
                 bestWeightPerExercise = new Dictionary<string, string?>();
@@ -90,16 +89,52 @@ namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
             return bestWeightPerExercise;
         }
 
-
-        private async Task<List<Meal>> GetLast30DaysMeals(string userId)
+        private async Task<(double avgReps, double avgSets)> GetTrainingAverages(string userId)
         {
-            var meals = await _context.Meals
-               .Where(c => c.UserId.Equals(userId))
-               .AsNoTracking()
-               .ToListAsync();
+            //      SELECT
+            //     (COUNT(*) / COUNT(DISTINCT t.id)) as avgSetsPerTraining,
+            //	   (sum(es.reps) / COUNT(DISTINCT t.id)) as avgRepsPerTraining
+            //     FROM
+            //    EXERCISESETS ES
+            //    JOIN TRAININGS T ON ES.TRAININGID = T.ID
+            //    WHERE
 
-            return meals;
+            //    T.USERID = PARAMUSERID
+
+            //    AND T.TRAINED >= (CURRENT_TIMESTAMP - INTERVAL '1 month');
+            var trainings = await _context.Trainings
+                                  .AsNoTracking()
+                                  .Include(c => c.ExerciseSets)
+                                  .Where(c => c.UserId.Equals(userId) &&
+                                          c.Trained >= DateTime.UtcNow.AddMonths(-1))
+                                  .ToListAsync();
+
+            var amountOfTrainings = trainings.Count;
+            var overallReps = trainings.Sum(t => t.ExerciseSets.Sum(es => es.Reps));
+            var overallSets = trainings.Sum(t => t.ExerciseSets.Count);
+
+            var avgReps = amountOfTrainings > 0 && overallReps > 0
+                ? Math.Round((double)overallReps / amountOfTrainings, 1)
+                : 0;
+
+            var avgSets = amountOfTrainings > 0 && overallSets > 0
+                ? Math.Round((double)overallSets / amountOfTrainings, 1)
+                : 0;
+
+            return (avgReps, avgSets);
         }
+
+
+
+        //private async Task<List<Meal>> GetLast30DaysMeals(string userId)
+        //{
+        //    var meals = await _context.Meals
+        //       .Where(c => c.UserId.Equals(userId))
+        //       .AsNoTracking()
+        //       .ToListAsync();
+
+        //    return meals;
+        //}
 
 
 
@@ -124,25 +159,6 @@ namespace Application.MonthlyStatistics.Queries.GetMonthlyStats
         //    }
 
         //    return resultDict;
-        //}
-
-        //private float GetAverageAmountOfRepsPerTraining(List<Training> trainingsPerMonth)
-        //{
-        //    var result = 0.0f;
-        //    var amountOfTrainings = trainingsPerMonth.Count;
-        //    var totalAmountOfRepsPerMonth = trainingsPerMonth.Sum(training => training.GetTrainingsOverallReps());
-
-        //    result = totalAmountOfRepsPerMonth / amountOfTrainings;
-        //    return result;
-        //}
-
-        //private float GetAverageAmountOfSetsPerTraining(List<Training> trainingsPerMonth)
-        //{
-        //    var amountOfTrainings = trainingsPerMonth.Count;
-        //    var totalAmountOfRepsPerMonth = trainingsPerMonth.Sum(training => training.GetTrainingsOverallSets());
-
-        //    var result = totalAmountOfRepsPerMonth / amountOfTrainings;
-        //    return result;
         //}
 
         //private double GetAverageAmountOfCaloriesPerDay(List<Meal> meals)

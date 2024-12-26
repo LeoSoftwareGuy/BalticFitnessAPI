@@ -40,10 +40,16 @@ namespace Application.MonthlyStatistics.Queries.GetSummaryInfoBasedOnFilter
                 var exercisesCount = trainings.Sum(t => t.ExerciseSets.Count);
 
 
-                //SELECT COUNT(DISTINCT e.MuscleGroupId)
-                //FROM Trainings t
-                //INNER JOIN ExerciseSets es ON t.Id = es.Training_Id
-                //INNER JOIN Exercises e ON es.Exercise_Id = e.Id;
+    //            SELECT
+    //    COALESCE(CAST(COUNT(DISTINCT TRAININGS.ID) AS INT), 0) AS SESSIONS,
+    //    COALESCE(CAST(COUNT(*) AS INT), 0) AS Sets,
+    //    COALESCE(CAST(COUNT(DISTINCT EXERCISES.musclegroupid) AS INT), 0) AS MuscleGroups
+    //FROM
+    //    EXERCISESETS
+    //    JOIN TRAININGS ON EXERCISESETS.TRAININGID = TRAININGS.ID
+    //    JOIN EXERCISES ON EXERCISES.ID = EXERCISESETS.exerciseid
+    //WHERE
+    //    TRAININGS.TRAINED >= pTimePeriod;
 
                 var muscleGroupsTrained = trainings
                         .SelectMany(t => t.ExerciseSets)
@@ -65,8 +71,8 @@ namespace Application.MonthlyStatistics.Queries.GetSummaryInfoBasedOnFilter
         {
             DateTime startDate = filter switch
             {
-                "Week" => DateTime.Now.AddDays(-7),       // Last 7 days
-                "Month" => DateTime.Now.AddMonths(-1),    // Last 30 days
+                "Week" => DateTime.UtcNow.AddDays(-7),       // Last 7 days in UTC
+                "Month" => DateTime.UtcNow.AddMonths(-1),    // Last 30 days in UTC
                 "All" => DateTime.MinValue,               // All data
                 _ => throw new ArgumentException("Invalid filter value.")
             };

@@ -29,7 +29,10 @@ namespace Application.MonthlyStatistics.Queries.GetBestExerciseStats
                 throw new UnauthorizedAccessException("User is not authenticated.");
             }
 
-            // SELET t.Id as TrainingId, MAX(es.Weight) as MaxWeight, MAX(es.Reps) as MaxReps, e.Name as ExerciseName,COUNT(*) AS Sets
+            // SELET t.Id as TrainingId, MAX(es.Weight) as MaxWeight,
+            // MAX(es.Reps) as MaxReps,
+            // e.Name as ExerciseName,
+            // COUNT(*) AS Sets
             // FROM ExerciseSets es 
             // INNER JOIN Trainings t ON es.Training_Id = t.Id
             // INNER JOIN Exercises e ON es.Exercise_Id = e.Id
@@ -61,14 +64,16 @@ namespace Application.MonthlyStatistics.Queries.GetBestExerciseStats
                 throw new InvalidOperationException("No data found for the given exercise.");
             }
 
-            return new GetBestExerciseStatsResult(new ExerciseStats
+            var result = new ExerciseStats
             {
                 ExerciseName = bestExerciseStats.ExerciseName,
                 TrainingId = bestExerciseStats.TrainingId,
                 Weight = bestExerciseStats.MaxWeight.ToString(),
                 Reps = bestExerciseStats.MaxReps,
                 Sets = bestExerciseStats.Sets
-            });
+            };
+
+            return new GetBestExerciseStatsResult(result);
         }
     }
 }

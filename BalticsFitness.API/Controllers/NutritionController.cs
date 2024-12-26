@@ -20,14 +20,14 @@ namespace BalticsFitness.API.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<FoodTypeDto>> GetFoodType(int id)
         {
-            return Ok(await Mediator.Send(new GetFoodTypeQuery { Id = id }));
+            return Ok(await Mediator.Send(new GetFoodTypeQuery(id)));
         }
 
         [HttpGet("{foodTypeUrl}")]
         [AllowAnonymous]
         public async Task<ActionResult<List<ProductDto>>> GetProductsByFoodType(string foodTypeUrl)
         {
-            return Ok(await Mediator.Send(new GetFoodProductsQuery { FoodTypeUrl = foodTypeUrl }));
+            return Ok(await Mediator.Send(new GetFoodProductsQuery(foodTypeUrl)));
         }
     }
 }
