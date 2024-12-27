@@ -32,6 +32,8 @@ namespace Application.MonthlyStatistics.Queries.GetLatestExerciseStats
                 throw new UnauthorizedAccessException("User is not authenticated.");
             }
 
+            var exerciseStats = new ExerciseStats();
+
 
             // SELECT es.Training_Id, es.Weight, es.Reps, e.Name as ExerciseName
             // FROM ExerciseSets es
@@ -51,7 +53,7 @@ namespace Application.MonthlyStatistics.Queries.GetLatestExerciseStats
 
             if (latestExercuseStats == null)
             {
-                throw new InvalidOperationException("No data found for the given exercise.");
+                return new GetLatestExerciseStatsResult(exerciseStats);
             }
 
             return new GetLatestExerciseStatsResult(new ExerciseStats

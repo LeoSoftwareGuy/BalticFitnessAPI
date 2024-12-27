@@ -29,6 +29,8 @@ namespace Application.MonthlyStatistics.Queries.GetBestExerciseStats
                 throw new UnauthorizedAccessException("User is not authenticated.");
             }
 
+            var exerciseStats = new ExerciseStats();
+
             // SELET t.Id as TrainingId, MAX(es.Weight) as MaxWeight,
             // MAX(es.Reps) as MaxReps,
             // e.Name as ExerciseName,
@@ -61,7 +63,7 @@ namespace Application.MonthlyStatistics.Queries.GetBestExerciseStats
 
             if (bestExerciseStats == null)
             {
-                throw new InvalidOperationException("No data found for the given exercise.");
+                return new GetBestExerciseStatsResult(exerciseStats);
             }
 
             var result = new ExerciseStats

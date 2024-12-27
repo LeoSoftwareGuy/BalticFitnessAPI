@@ -97,7 +97,7 @@ namespace Application.Trainings.Queries.GetTrainings
 
                             var exerciseGroup = new ExerciseGroupDto
                             {
-                                Name = allExerciseSetsForThisMuscleGroup.First().Exercise.Name,
+                                Name = allExerciseSetsForThisMuscleGroup.FirstOrDefault(e=>e.ExerciseId.Equals(uniqueExerciseIdForParticluarMuscleGroup)).Exercise.Name,
                                 Id = uniqueExerciseIdForParticluarMuscleGroup,
                                 ExerciseSets = allExerciseSetsForAnExercise
                             };
