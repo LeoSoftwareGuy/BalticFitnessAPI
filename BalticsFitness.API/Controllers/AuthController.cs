@@ -56,6 +56,7 @@ namespace BalticsFitness.API.Controllers
                     {
                         HttpOnly = true,
                         Secure = true,
+                        Path = "/",
                         Expires = DateTime.UtcNow.AddDays(2)
                     });
 

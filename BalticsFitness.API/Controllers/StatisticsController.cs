@@ -4,6 +4,7 @@ using Application.MonthlyStatistics.Queries.GetMonthlyStats;
 using Application.MonthlyStatistics.Queries.GetSummaryInfoBasedOnFilter;
 using Application.MonthlyStatistics.Queries.GetBestExerciseStats;
 using Application.MonthlyStatistics.Queries.GetLatestExerciseStats;
+using Application.MonthlyStatistics.Queries.GetExercisesSetsForAnExerciseLastThreeMonths;
 
 namespace BalticsFitness.API.Controllers
 {
@@ -21,7 +22,7 @@ namespace BalticsFitness.API.Controllers
             return Ok(await Mediator.Send(new GetSummaryInfoBasedOnFilterQuery(filterBy)));
         }
 
-        [HttpGet("exercise/{exerciseId}/{type}")]
+        [HttpGet("{exerciseId}/{type}")]
         public async Task<ActionResult<ExerciseStats>> GetBestExerciseStats(int exerciseId, string type)
         {
             if (type == "Best")
@@ -34,6 +35,12 @@ namespace BalticsFitness.API.Controllers
                 // Handle "Last" type
                 return Ok(await Mediator.Send(new GetLatestExerciseStatsQuery(exerciseId)));
             }
+        }
+
+        [HttpGet("{exerciseId}")]
+        public async Task<ActionResult<ExerciseStatsLastThreeMonths>> GetExerciseHistory(int exerciseId)
+        {
+            return Ok(await Mediator.Send(new GetExerciseHistoryQuery(exerciseId)));
         }
     }
 }

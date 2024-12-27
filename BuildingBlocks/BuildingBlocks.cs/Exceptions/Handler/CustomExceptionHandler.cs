@@ -41,6 +41,11 @@ public class CustomExceptionHandler
                 exception.GetType().Name,
                 context.Response.StatusCode = StatusCodes.Status404NotFound
             ),
+            UnauthorizedAccessException =>
+            (    exception.Message,
+                 exception.GetType().Name,
+                 context.Response.StatusCode = StatusCodes.Status401Unauthorized
+            ),
             _ =>
             (
                 exception.Message,

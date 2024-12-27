@@ -29,15 +29,15 @@ internal class Program
         builder.Services.AddSwaggerGen();
 
         // does not really work, I was able to hit url with my client even with this commented out
-        //builder.Services.AddCors(options =>
-        //{
-        //    options.AddPolicy("AllowMobileUI", policy =>
-        //    {
-        //        policy.WithOrigins("http://localhost:7081", "http://192.168.1.182:7081")
-        //              .AllowAnyMethod()
-        //              .AllowAnyHeader();
-        //    });
-        //});
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowMobileUI", policy =>
+            {
+                policy.WithOrigins("http://localhost:8081", "http://192.168.1.165:8081")
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+            });
+        });
 
 
         // Load JWT settings
@@ -77,7 +77,7 @@ internal class Program
             await app.InitialiseDatabaseAsync();
         }
 
-       // app.UseCors("AllowMobileUI");
+        app.UseCors("AllowMobileUI");
         //app.UseHttpsRedirection();
 
         app.UseAuthentication();

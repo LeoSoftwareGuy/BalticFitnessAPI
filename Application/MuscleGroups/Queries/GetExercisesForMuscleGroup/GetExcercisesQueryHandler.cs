@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Application.MuscleGroups.Queries.GetExercises
 {
     public record GetExcercisesForMuscleGroupQuery(int MuscleGroupId) : IQuery<GetExercisesResult>;
-    public record GetExercisesResult(List<ExerciseDto> ExerciseDtos);
+    public record GetExercisesResult(MuscleGroupDto MuscleGroupDto);
 
     public class GetExcercisesQueryHandler : IQueryHandler<GetExcercisesForMuscleGroupQuery, GetExercisesResult>
     {
@@ -34,8 +34,8 @@ namespace Application.MuscleGroups.Queries.GetExercises
                 throw new MuscleGroupNotFoundException(nameof(MuscleGroup), new { request.MuscleGroupId });
             }
 
-            var exerciseDtos = _mapper.Map<List<ExerciseDto>>(muscleGroup.Exercises);
-            return new GetExercisesResult(exerciseDtos);
+            var muscleGroupDto = _mapper.Map<MuscleGroupDto>(muscleGroup);
+            return new GetExercisesResult(muscleGroupDto);
         }
     }
 }
