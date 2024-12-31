@@ -1,80 +1,80 @@
-﻿using Application.Data;
-using Application.Support.Interfaces;
-using Application.Trainings.DTOs.Nutrition;
-using AutoMapper;
-using BuildingBlocks.CQRS;
-using Domain.Nutrition;
-using Microsoft.EntityFrameworkCore;
+﻿//using Application.Data;
+//using Application.Support.Interfaces;
+//using Application.Trainings.DTOs.Nutrition;
+//using AutoMapper;
+//using BuildingBlocks.CQRS;
+//using Domain.Nutrition;
+//using Microsoft.EntityFrameworkCore;
 
-namespace Application.Trainings.Queries.GetMeals
-{
-    public record GetMealsRequest : IQuery<GetMealsResult>;
-    public record GetMealsResult(List<SortedByDayNutrients> SortedByDayNutrientsDtos);
-    public class GetMealsRequestHandler : IQueryHandler<GetMealsRequest, GetMealsResult>
-    {
-        private readonly IMapper _mapper;
-        private readonly ITrainingDbContext _context;
-        private readonly ICurrentUserService _currentUserService;
+//namespace Application.Trainings.Queries.GetMeals
+//{
+//    public record GetMealsRequest : IQuery<GetMealsResult>;
+//    public record GetMealsResult(List<SortedByDayNutrients> SortedByDayNutrientsDtos);
+//    public class GetMealsRequestHandler : IQueryHandler<GetMealsRequest, GetMealsResult>
+//    {
+//        private readonly IMapper _mapper;
+//        private readonly ITrainingDbContext _context;
+//        private readonly ICurrentUserService _currentUserService;
 
-        public GetMealsRequestHandler(IMapper mapper, ITrainingDbContext context, ICurrentUserService currentUserService)
-        {
-            _mapper = mapper;
-            _context = context;
-            _currentUserService = currentUserService;
-        }
+//        public GetMealsRequestHandler(IMapper mapper, ITrainingDbContext context, ICurrentUserService currentUserService)
+//        {
+//            _mapper = mapper;
+//            _context = context;
+//            _currentUserService = currentUserService;
+//        }
 
-        public async Task<GetMealsResult> Handle(GetMealsRequest request, CancellationToken cancellationToken)
-        {
-            var userId = _currentUserService.UserId;
+//        public async Task<GetMealsResult> Handle(GetMealsRequest request, CancellationToken cancellationToken)
+//        {
+//            var userId = _currentUserService.UserId;
 
-            if (userId == null)
-            {
-                throw new UnauthorizedAccessException("User is not authenticated.");
-            }
+//            if (userId == null)
+//            {
+//                throw new UnauthorizedAccessException("User is not authenticated.");
+//            }
 
-            var result = new List<SortedByDayNutrients>();
-            var meals = await _context.Meals
-                .Where(c => c.UserId.Equals(userId))
-                .ToListAsync(cancellationToken);
+//            var result = new List<SortedByDayNutrients>();
+//            var meals = await _context.Meals
+//                .Where(c => c.UserId.Equals(userId))
+//                .ToListAsync(cancellationToken);
 
 
-            if (meals.Any())
-            {
-                var sortedByDateMeals = new Dictionary<int, List<Meal>>();
+//            if (meals.Any())
+//            {
+//                var sortedByDateMeals = new Dictionary<int, List<Meal>>();
 
-                foreach (var meal in meals.OrderByDescending(d => d.MealTime))
-                {
-                    if (sortedByDateMeals.ContainsKey(meal.MealTime.DayOfYear))
-                        sortedByDateMeals[meal.MealTime.DayOfYear].Add(meal);
-                    else
-                        sortedByDateMeals[meal.MealTime.DayOfYear] = new List<Meal> { meal };
-                }
+//                foreach (var meal in meals.OrderByDescending(d => d.MealTime))
+//                {
+//                    if (sortedByDateMeals.ContainsKey(meal.MealTime.DayOfYear))
+//                        sortedByDateMeals[meal.MealTime.DayOfYear].Add(meal);
+//                    else
+//                        sortedByDateMeals[meal.MealTime.DayOfYear] = new List<Meal> { meal };
+//                }
 
-                foreach (var sortedByDateMeal in sortedByDateMeals)
-                {
-                    var calories = sortedByDateMeal.Value.Sum(m => m.GetMealsTotalCalories());
-                    var carbs = sortedByDateMeal.Value.Sum(m => m.GetMealsTotalCarbs());
-                    var proteins = sortedByDateMeal.Value.Sum(m => m.GetMealsTotalProtein());
-                    var fats = sortedByDateMeal.Value.Sum(m => m.GetMealsTotalFats());
-                    result.Add(new SortedByDayNutrients()
-                    {
-                        DayOfTheYear = sortedByDateMeal.Key,
-                        DayCalories = RoundUpForDouble(calories, 2),
-                        DayCarbs = RoundUpForDouble(carbs, 2),
-                        DayFats = RoundUpForDouble(fats, 2),
-                        DayProteins = RoundUpForDouble(proteins, 2)
-                    });
-                }
-            }
+//                foreach (var sortedByDateMeal in sortedByDateMeals)
+//                {
+//                    var calories = sortedByDateMeal.Value.Sum(m => m.GetMealsTotalCalories());
+//                    var carbs = sortedByDateMeal.Value.Sum(m => m.GetMealsTotalCarbs());
+//                    var proteins = sortedByDateMeal.Value.Sum(m => m.GetMealsTotalProtein());
+//                    var fats = sortedByDateMeal.Value.Sum(m => m.GetMealsTotalFats());
+//                    result.Add(new SortedByDayNutrients()
+//                    {
+//                        DayOfTheYear = sortedByDateMeal.Key,
+//                        DayCalories = RoundUpForDouble(calories, 2),
+//                        DayCarbs = RoundUpForDouble(carbs, 2),
+//                        DayFats = RoundUpForDouble(fats, 2),
+//                        DayProteins = RoundUpForDouble(proteins, 2)
+//                    });
+//                }
+//            }
 
-            return new GetMealsResult(result);
-        }
-        private double RoundUpForDouble(double input, int places)
-        {
-            double multiplier = Math.Pow(10, Convert.ToDouble(places));
-            return Math.Ceiling(input * multiplier) / multiplier;
-        }
-    }
-}
+//            return new GetMealsResult(result);
+//        }
+//        private double RoundUpForDouble(double input, int places)
+//        {
+//            double multiplier = Math.Pow(10, Convert.ToDouble(places));
+//            return Math.Ceiling(input * multiplier) / multiplier;
+//        }
+//    }
+//}
 
 

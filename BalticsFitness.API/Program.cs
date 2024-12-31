@@ -74,7 +74,7 @@ internal class Program
         {
             app.UseSwagger();
             app.UseSwaggerUI();
-            await app.InitialiseDatabaseAsync();
+            //await app.InitialiseDatabaseAsync();
         }
 
         app.UseCors("AllowMobileUI");
