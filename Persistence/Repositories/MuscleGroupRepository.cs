@@ -76,12 +76,30 @@ namespace Persistence.Repositories
 
             try
             {
-                string sql = "SELECT * FROM muscles WHERE muscles.id = @MuscleId";
-                var muscleGroup = await connection.QuerySingleOrDefaultAsync<MuscleGroup>(
-                    sql,
-                    new { MuscleId = id });
+                string sql = """
+                             select * from muscles
+                             join exercises on muscles.id = exercises.musclegroupid
+                             where muscles.id = @MuscleId
+                             """;
 
-                return muscleGroup;
+                var muscleGroupDictionary = new Dictionary<int, MuscleGroup>();
+
+                await connection.QueryAsync<MuscleGroup, Exercise, MuscleGroup>(
+                    sql,
+                    (muscle, exercise) =>
+                    {
+                        if (!muscleGroupDictionary.TryGetValue(muscle.Id, out var muscleGroup))
+                        {
+                            muscleGroup = muscle;
+                            muscleGroup.Exercises = new List<Exercise>();
+                            muscleGroupDictionary.Add(muscle.Id, muscleGroup);
+                        }
+                        muscleGroup.Exercises.Add(exercise);
+                        return muscleGroup;
+                    },
+                    new { MuscleId = id }
+                );
+                return muscleGroupDictionary.Values.FirstOrDefault(); ;
             }
             catch (Exception ex)
             {

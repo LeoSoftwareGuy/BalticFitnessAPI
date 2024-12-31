@@ -25,7 +25,7 @@ namespace Application.MuscleGroups.Queries.GetExercises
         //Dapper
         public async Task<GetExercisesResult> Handle(GetExcercisesForMuscleGroupQuery request, CancellationToken cancellationToken)
         {
-            var muscleGroup = _context.GetMuscleGroup(request.MuscleGroupId);
+            var muscleGroup =  await _context.GetMuscleGroup(request.MuscleGroupId);
 
             if (muscleGroup == null)
             {

@@ -1,18 +1,23 @@
-﻿using System.Linq;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Application.Data;
 using Application.MonthlyStatistics;
 using Application.Trainings.DTOs.Trainings;
 using Dapper;
-using Microsoft.Identity.Client;
 using Persistence.SqlDataBase;
 
 namespace Persistence.Repositories
 {
     public record BestWorkingWeightPerExercise(string ExerciseName, string BestWeight);
-    public record AvgStats(int Reps, int Sets);
+    public class AvgStats {
 
-    public record History(Dictionary<DateTime, List<ExerciseSetDto>> ExerciseHistory);
+        public AvgStats()
+        {
+            
+        }
+        public double Reps { get; set; }
+        public double Sets { get; set; }
+    }
+
 
     public class MonthlyStatisticsRepository : IMonthlyStatisticsRepository
     {
@@ -71,7 +76,7 @@ namespace Persistence.Repositories
                 var sql = """
                   SELECT
                      T.TRAINED,
-                     json_agg(json_build_object('reps', ES.REPS, 'weight', ES.WEIGHT)) AS sets
+                     json_agg(json_build_object('Reps', ES.REPS, 'Weight', ES.WEIGHT,'ExerciseId', ES.EXERCISEID )) AS sets
                    FROM
                     TRAININGS T
                     JOIN
@@ -119,8 +124,8 @@ namespace Persistence.Repositories
             try
             {
                 string sql = """
-                             SELECT
-                             t.Trained as TrainingId,
+                             
+                             SELECT t.Id as TrainingId,
                              es.Weight as Weight, 
                              es.Reps as Reps,
                              e.Name as ExerciseName,
@@ -134,7 +139,7 @@ namespace Persistence.Repositories
                                FROM Trainings
                                WHERE UserId = @UserId
                              )
-                             GROUP BY t.Trained, es.Weight, es.Reps, e.Name
+                             GROUP BY t.Id,e.Name,es.Weight,es.Reps
                              ORDER BY t.Trained DESC
                              LIMIT 1;
                              
@@ -194,8 +199,8 @@ namespace Persistence.Repositories
 
                 var statResults = new StatResults
                 {
-                    AverageAmountOfRepsPerTraining = avgResults.Reps,
-                    AverageAmountOfSetsPerTraining = avgResults.Sets,
+                    AverageAmountOfRepsPerTraining = (double)avgResults.Reps,
+                    AverageAmountOfSetsPerTraining = (double)avgResults.Sets,
                     BestWorkingWeightPerExercise = bestWorkingWeightPerExercise.ToDictionary(g => g.ExerciseName, g => g.BestWeight)
                 };
 
@@ -209,37 +214,33 @@ namespace Persistence.Repositories
 
         public async Task<SummaryInfoBasedOnFilter> GetSummaryInfoBasedOnFilter(string filter, string userId)
         {
-            string interval = filter switch
-            {
-                "Week" => "1 week",     // Last 7 days in UTC
-                "Month" => "1 month",    // Last 30 days in UTC
-                "All" => string.Empty, // All data
-                _ => throw new ArgumentException("Invalid filter value.")
-            };
-
-
             using var connection = _connectionFactory.Create();
             try
             {
-                string sql = """
-                                SELECT
-                              SELECT
-                                  COALESCE(CAST(COUNT(DISTINCT TRAININGS.ID) AS INT), 0) AS SESSIONS,
-                                  COALESCE(CAST(COUNT(*) AS INT), 0) AS SETS,
-                                  COALESCE(CAST(COUNT(DISTINCT EXERCISES.MUSCLEGROUPID) AS INT), 0) AS MUSCLEGROUPS
-                              FROM
-                                  EXERCISESETS
-                                  JOIN TRAININGS ON EXERCISESETS.TRAININGID = TRAININGS.ID
-                                  JOIN EXERCISES ON EXERCISES.ID = EXERCISESETS.EXERCISEID
-                              WHERE
-                                  TRAININGS.TRAINED >= (CURRENT_TIMESTAMP - INTERVAL @Interval)
-                                  AND TRAININGS.USERID = @UserId;
-                              
-                              """;
+
+                string intervalCondition = filter switch
+                {
+                    "Week" => "AND TRAININGS.TRAINED >= (CURRENT_TIMESTAMP - INTERVAL '1 week')",
+                    "Month" => "AND TRAININGS.TRAINED >= (CURRENT_TIMESTAMP - INTERVAL '1 month')",
+                    "All" => ""  // No date filter for 'All'
+                };
+
+                string sql = $"""
+          SELECT
+              COALESCE(CAST(COUNT(DISTINCT TRAININGS.ID) AS INT), 0) AS SESSIONS,
+              COALESCE(CAST(COUNT(*) AS INT), 0) AS SETS,
+              COALESCE(CAST(COUNT(DISTINCT EXERCISES.MUSCLEGROUPID) AS INT), 0) AS MUSCLEGROUPS
+          FROM
+              EXERCISESETS
+              JOIN TRAININGS ON EXERCISESETS.TRAININGID = TRAININGS.ID
+              JOIN EXERCISES ON EXERCISES.ID = EXERCISESETS.EXERCISEID
+          WHERE
+              TRAININGS.USERID = @UserId
+              {intervalCondition};
+          """;
 
                 var summaryInfoBasedOnFilter = await connection.QuerySingleOrDefaultAsync<SummaryInfoBasedOnFilter>(sql, new
                 {
-                    Interval = interval,
                     UserId = userId
                 });
 
