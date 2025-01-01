@@ -9,13 +9,8 @@ namespace Persistence.Repositories
 {
     public record BestWorkingWeightPerExercise(string ExerciseName, string BestWeight);
     public class AvgStats {
-
-        public AvgStats()
-        {
-            
-        }
-        public double Reps { get; set; }
-        public double Sets { get; set; }
+        public double AVGSETSPERTRAINING { get; set; }
+        public double AVGREPSPERTRAINING { get; set; }
     }
 
 
@@ -184,14 +179,14 @@ namespace Persistence.Repositories
 
                 string sqlForAvgSetsAvgReps = """
                                              SELECT
-                                             	(COUNT(*) / COUNT(DISTINCT T.ID)) AS AVGSETSPERTRAINING,
-                                             	(SUM(ES.REPS) / COUNT(DISTINCT T.ID)) AS AVGREPSPERTRAINING
+                                                 (COUNT(*)::double precision / COUNT(DISTINCT T.ID)) AS AVGSETSPERTRAINING,
+                                                 (SUM(ES.REPS)::double precision / COUNT(DISTINCT T.ID)) AS AVGREPSPERTRAINING
                                              FROM
-                                             	EXERCISESETS ES
-                                             	JOIN TRAININGS T ON ES.TRAININGID = T.ID
+                                                 EXERCISESETS ES
+                                                 JOIN TRAININGS T ON ES.TRAININGID = T.ID
                                              WHERE
-                                             	T.USERID = @UserId
-                                             	AND T.TRAINED >= (CURRENT_TIMESTAMP - INTERVAL '1 month');
+                                                 T.USERID = @UserId
+                                                 AND T.TRAINED >= (CURRENT_TIMESTAMP - INTERVAL '1 month');                                           
                                              """;
 
                 var bestWorkingWeightPerExercise = await connection.QueryAsync<BestWorkingWeightPerExercise>(sqlForBestWorkingWeightPerExercise, new { UserId = userId });
@@ -199,8 +194,8 @@ namespace Persistence.Repositories
 
                 var statResults = new StatResults
                 {
-                    AverageAmountOfRepsPerTraining = (double)avgResults.Reps,
-                    AverageAmountOfSetsPerTraining = (double)avgResults.Sets,
+                    AverageAmountOfRepsPerTraining = (double)avgResults.AVGREPSPERTRAINING,
+                    AverageAmountOfSetsPerTraining = (double)avgResults.AVGSETSPERTRAINING,
                     BestWorkingWeightPerExercise = bestWorkingWeightPerExercise.ToDictionary(g => g.ExerciseName, g => g.BestWeight)
                 };
 
@@ -227,9 +222,9 @@ namespace Persistence.Repositories
 
                 string sql = $"""
           SELECT
-              COALESCE(CAST(COUNT(DISTINCT TRAININGS.ID) AS INT), 0) AS SESSIONS,
-              COALESCE(CAST(COUNT(*) AS INT), 0) AS SETS,
-              COALESCE(CAST(COUNT(DISTINCT EXERCISES.MUSCLEGROUPID) AS INT), 0) AS MUSCLEGROUPS
+              COALESCE(COUNT(DISTINCT TRAININGS.ID), 0) AS SessionsCount,
+              COALESCE(COUNT(*), 0) AS ExercisesCount,
+              COALESCE(COUNT(DISTINCT EXERCISES.MUSCLEGROUPID), 0) AS MuscleGroupsCount
           FROM
               EXERCISESETS
               JOIN TRAININGS ON EXERCISESETS.TRAININGID = TRAININGS.ID

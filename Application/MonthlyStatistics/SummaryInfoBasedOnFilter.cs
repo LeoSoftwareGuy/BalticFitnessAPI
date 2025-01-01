@@ -2,8 +2,8 @@
 {
     public class SummaryInfoBasedOnFilter
     {
-        public int SessionsCount { get; set; }
-        public int ExercisesCount { get; set; }
-        public int MuscleGroupsCount { get; set; }
+        public long SessionsCount { get; set; }
+        public long ExercisesCount { get; set; }
+        public long MuscleGroupsCount { get; set; }
     }
 }

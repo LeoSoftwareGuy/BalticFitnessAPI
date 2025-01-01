@@ -37,55 +37,5 @@ namespace Application.MonthlyStatistics.Queries.GetBestExerciseStats
 
             return new GetBestExerciseStatsResult(bestExerciseStats);
         }
-
-
-
-
-        ////EFCore
-        //public async Task<GetBestExerciseStatsResult> Handle(GetBestExerciseStatsQuery request, CancellationToken cancellationToken)
-        //{
-        //    var userId = _currentUserService.UserId;
-
-        //    if (userId == null)
-        //    {
-        //        throw new UnauthorizedAccessException("User is not authenticated.");
-        //    }
-
-        //    var exerciseStats = new ExerciseStats();
-
-        //    var bestExerciseStats = await _context.ExerciseSets
-        //        .AsNoTracking()
-        //        .Include(t => t.Training)
-        //        .Include(e => e.Exercise)
-        //        .Where(es => es.ExerciseId == request.ExerciseId && es.Training.UserId == userId)
-        //        .GroupBy(t => t.TrainingId)
-        //        .Select(group => new
-        //        {
-        //            TrainingId = group.Key,
-        //            MaxWeight = group.Max(t => t.Weight),
-        //            MaxReps = group.Max(t => t.Reps),
-        //            ExerciseName = group.First().Exercise.Name,
-        //            Sets = group.Count(t => t.ExerciseId == request.ExerciseId)
-        //        })
-        //        .OrderByDescending(es => es.MaxWeight)
-        //        .ThenByDescending(es => es.MaxReps)
-        //        .FirstOrDefaultAsync(cancellationToken);
-
-        //    if (bestExerciseStats == null)
-        //    {
-        //        return new GetBestExerciseStatsResult(exerciseStats);
-        //    }
-
-        //    var result = new ExerciseStats
-        //    {
-        //        ExerciseName = bestExerciseStats.ExerciseName,
-        //        TrainingId = bestExerciseStats.TrainingId,
-        //        Weight = bestExerciseStats.MaxWeight.ToString(),
-        //        Reps = bestExerciseStats.MaxReps,
-        //        Sets = bestExerciseStats.Sets
-        //    };
-
-        //    return new GetBestExerciseStatsResult(result);
-        //}
     }
 }
